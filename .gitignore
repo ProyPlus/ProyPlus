@@ -1,0 +1,15 @@
+node_modules/
+**/.angular/
+**/dist/
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-store/
+.cache/
+.tmp/
+.DS_Store
+node_modules/
+**/.angular/
+**/dist/

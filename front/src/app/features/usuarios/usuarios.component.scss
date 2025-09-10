@@ -1,0 +1,20 @@
+/* Inputs y selects a full width */
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-password,
+:host ::ng-deep .p-multiselect {
+  width: 100%;
+}
+
+.p-field > label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-weight: 500;
+}
+
+.p-field-checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.ml-2 { margin-left: .5rem; }
+.w-100 { width: 100%; }
