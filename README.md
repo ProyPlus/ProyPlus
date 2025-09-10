@@ -1,16 +1,28 @@
-## Hi there 👋
+# Create a README for Angular frontend setup
+readme_content = r"""# Frontend (Angular) — Guía de instalación y uso
 
-<!--
-**ProyPlus/ProyPlus** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+Este proyecto usa **Angular 20** y **Node.js 20 LTS**. El código del front está en la carpeta `front/`.
 
-Here are some ideas to get you started:
+> Si solo querés correrlo: seguí **Instalación rápida** y **Modo desarrollo**.  
+> Si recién clonaste y te falló el push por archivos grandes, revisá **Solución a errores comunes** al final.
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+---
+
+## Requisitos
+
+- **Git** 2.40+
+- **Node.js 20 LTS** (recomendado)  
+  - Sugerido usar un manejador de versiones:
+    - Linux/macOS: `nvm`  
+      ```bash
+      nvm install 20
+      nvm use 20
+      ```
+    - Windows: `nvm-windows`
+      ```powershell
+      nvm install 20
+      nvm use 20
+      ```
+- **Angular CLI** 20.x
+  ```bash
+  npm i -g @angular/cli@20
