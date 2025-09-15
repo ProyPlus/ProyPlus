@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Menubar } from 'primeng/menubar';
 import { PanelMenu } from 'primeng/panelmenu';
@@ -6,7 +6,7 @@ import { Menu } from 'primeng/menu';
 import { Button } from 'primeng/button';
 import { Avatar } from 'primeng/avatar';
 import { Badge } from 'primeng/badge';
-import { NgIf, NgClass } from '@angular/common';
+import { AuthService } from '../features/auth/login/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -14,13 +14,16 @@ import { NgIf, NgClass } from '@angular/common';
   imports: [
     RouterOutlet,
     RouterLink, RouterLinkActive,
-    Menubar, PanelMenu, Menu, Button, Avatar, Badge, NgIf, NgClass             
+    Menubar, PanelMenu, Menu, Button, Avatar, Badge,
   ],
   templateUrl: './shell.component.html',
   styleUrls: ['./shell.component.scss']
 })
 export class ShellComponent {
   sidebarCollapsed = false;
+
+  private router = inject(Router);
+  private auth = inject(AuthService);
 
   // Menú de usuario (overlay)
   @ViewChild('userMenu') userMenu!: Menu;
@@ -33,12 +36,12 @@ export class ShellComponent {
 
   // Menú de navegación lateral
   sideModel = [
-    { label: 'Inicio', icon: 'pi pi-home', routerLink: '/' },
+    { label: 'Inicio', icon: 'pi pi-home', routerLink: '/home' }, // sugerencia: usar /home si es tu ruta protegida
     {
       label: 'Gestión',
       icon: 'pi pi-database',
       items: [
-       
+        // agrega acá submenús
       ],
     },
     {
@@ -48,18 +51,15 @@ export class ShellComponent {
         { label: 'Dashboard', icon: 'pi pi-chart-bar', disabled: true },
       ],
     },
-    { 
-      label: 'Configuración', 
-      icon: 'pi pi-cog', 
-        items: [
-          { label: 'Usuarios', icon: 'pi pi-users', routerLink: '/usuarios' },
-          {label: 'Roles', icon: 'pi pi-id-card', routerLink: '/roles'}
-       
-      ], },
-     
+    {
+      label: 'Configuración',
+      icon: 'pi pi-cog',
+      items: [
+        { label: 'Usuarios', icon: 'pi pi-users', routerLink: '/usuarios' },
+        { label: 'Roles', icon: 'pi pi-id-card', routerLink: '/roles' },
+      ],
+    },
   ];
-
-  constructor(private router: Router) {}
 
   toggleSidebar() {
     this.sidebarCollapsed = !this.sidebarCollapsed;
@@ -74,7 +74,7 @@ export class ShellComponent {
   }
 
   logout() {
-    // TODO: integrar con tu auth real
-    console.log('logout');
+    this.auth.logout();
+    this.router.navigateByUrl('/auth/login', { replaceUrl: true });
   }
 }

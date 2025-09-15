@@ -3,6 +3,9 @@
     "target": "http://72.60.11.35:8080",
     "secure": false,
     "changeOrigin": true,
-    "logLevel": "debug"
+    "logLevel": "debug",
+    "pathRewrite": {
+      "^/api/auth": "/auth"
+    }
   }
 }

@@ -1,3 +1,6 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 :root { --brand: #0ea5e9; }
 html, body { height: 100%; }
 body { margin: 0; font-family: Inter, Roboto, "Helvetica Neue", Arial, sans-serif; }
