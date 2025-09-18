@@ -1,88 +1,159 @@
+/* Estilos del Shell (sidebar + topbar) */
 :host {
   --topbar-h: 56px;
-  --sidebar-w: 260px;
-  --sidebar-w-collapsed: 64px;
+
+  /* 🎨 tokens del sidebar */
+  --sidebar-bg: var(--surface-ground);
+  --sidebar-item-bg: transparent;
+  --sidebar-item-hover-bg: var(--surface-hover);
+  --sidebar-item-active-bg: var(--surface-card);
+  --sidebar-accent: var(--primary-color);
 
   display: block;
   height: 100dvh;
 }
 
-/* Top bar */
+/* ===== Topbar ===== */
 .topbar {
   height: var(--topbar-h);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 .75rem;
-  border-bottom: 1px solid var(--p-content-border-color, rgba(0,0,0,.06));
   position: sticky;
   top: 0;
   z-index: 10;
-  background: var(--p-content-background, #fff);
 
-  .left {
-    display: flex;
-    align-items: center;
-    gap: .5rem;
+  background: var(--surface-section);
+  border-bottom: 1px solid var(--surface-border);
 
-    .brand {
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 1.05rem;
-      color: var(--p-text-color, #111);
-    }
+  .left { display:flex; align-items:center; gap:.5rem; }
+  .brand {
+    display:inline-flex; align-items:center; gap:.5rem;
+    font-weight:700; font-size:1.05rem; color: var(--text-color); text-decoration:none;
   }
-
-  .right {
-    display: flex;
-    align-items: center;
-    gap: .25rem;
-
-    .user-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: .5rem;
-
-      .user-name {
-        font-weight: 600;
-      }
-    }
-  }
+  .right { display:flex; align-items:center; gap:.25rem; }
+  .user-btn .user-name { font-weight:600; color: var(--text-color); }
 }
 
-/* Layout grid */
+/* ===== Layout grid (sidebar + contenido) ===== */
 .layout {
   height: calc(100dvh - var(--topbar-h));
   display: grid;
-  grid-template-columns: var(--sidebar-w) 1fr;
+  grid-template-columns: 260px 1fr;
+  grid-template-areas: "sidebar content";
   transition: grid-template-columns .2s ease;
+}
+.layout.collapsed { grid-template-columns: 64px 1fr; }
 
-  .sidebar {
-    border-right: 1px solid var(--p-content-border-color, rgba(0,0,0,.06));
-    overflow: auto;
-
-    &.collapsed {
-      width: var(--sidebar-w-collapsed);
-      .p-panelmenu .p-panelmenu-header .p-panelmenu-header-content .p-panelmenu-header-action .p-menuitem-text,
-      .p-panelmenu .p-panelmenu-content .p-submenu-list .p-menuitem-link .p-menuitem-text {
-        display: none; // texto del item oculto en colapsado
-      }
-      .side-menu {
-        padding-inline: .25rem;
-      }
-    }
-  }
-
-  .content {
-    overflow: auto;
-    padding: 1rem;
-    background: var(--p-surface-50, #fafafa);
-  }
+.sidebar {
+  grid-area: sidebar;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--surface-border);
+  overflow: auto;
+  padding: .75rem .5rem;
 }
 
-/* Responsive (sidebar como rail estrecho) */
+.content {
+  grid-area: content;
+  overflow: auto;
+  padding: 1rem;
+  background: var(--surface-ground);
+}
+
+/* ===============================
+   PanelMenu del sidebar (scoped)
+   =============================== */
+
+/* ¡IMPORTANTE! Usamos ::ng-deep + styleClass="side-menu" para traspasar la encapsulación */
+:host ::ng-deep .side-menu,
+:host ::ng-deep .side-menu .p-panelmenu-panel,
+:host ::ng-deep .side-menu .p-panelmenu-content {
+  background: transparent !important;
+  border: 0 !important;
+  color: var(--text-color);
+}
+
+/* headers (nivel 1) e items (nivel 2+) */
+:host ::ng-deep .side-menu .p-panelmenu-header .p-panelmenu-header-content .p-panelmenu-header-action,
+:host ::ng-deep .side-menu .p-panelmenu-content .p-submenu-list .p-menuitem .p-menuitem-content .p-menuitem-link {
+  position: relative;
+  display: flex; align-items: center; gap: .6rem;
+  padding: .65rem .75rem .65rem 1.25rem;
+
+  background: var(--sidebar-item-bg) !important;
+  color: var(--text-color) !important;
+  border: 1px solid var(--surface-border) !important;
+  border-radius: 12px;
+
+  transition: background .16s ease, transform .16s ease, border-color .16s ease;
+}
+
+/* hover */
+:host ::ng-deep .side-menu .p-panelmenu-header .p-panelmenu-header-content .p-panelmenu-header-action:hover,
+:host ::ng-deep .side-menu .p-panelmenu-content .p-submenu-list .p-menuitem .p-menuitem-content .p-menuitem-link:hover {
+  background: var(--sidebar-item-hover-bg) !important;
+  transform: translateX(2px);
+}
+
+/* activo (grupo expandido o routerLink activo) */
+:host ::ng-deep .side-menu .p-panelmenu-header .p-panelmenu-header-content .p-panelmenu-header-action[aria-expanded="true"],
+:host ::ng-deep .side-menu .p-menuitem-link.router-link-active {
+  background: var(--sidebar-item-active-bg) !important;
+  border-color: color-mix(in oklab, var(--sidebar-accent), #000 70%) !important;
+}
+
+/* barrita de acento a la izquierda */
+:host ::ng-deep .side-menu .p-panelmenu-header .p-panelmenu-header-content .p-panelmenu-header-action::before,
+:host ::ng-deep .side-menu .p-menuitem-link::before {
+  content: "";
+  position: absolute; inset: 8px auto 8px 8px;
+  width: 3px; border-radius: 2px;
+  background: transparent; transition: background .16s ease;
+}
+:host ::ng-deep .side-menu .p-panelmenu-header .p-panelmenu-header-content .p-panelmenu-header-action:hover::before,
+:host ::ng-deep .side-menu .p-panelmenu-header .p-panelmenu-header-content .p-panelmenu-header-action[aria-expanded="true"]::before,
+:host ::ng-deep .side-menu .p-menuitem-link.router-link-active::before {
+  background: var(--sidebar-accent);
+}
+
+/* íconos */
+:host ::ng-deep .side-menu .p-menuitem-icon,
+:host ::ng-deep .side-menu .p-panelmenu-header-icon { opacity: .9; }
+
+/* colapsado: sólo íconos centrados */
+.layout.collapsed :host ::ng-deep .side-menu .p-menuitem-text,
+.layout.collapsed :host ::ng-deep .side-menu .p-submenu-icon,
+.layout.collapsed :host ::ng-deep .side-menu .p-panelmenu-icon { display: none; }
+.layout.collapsed :host ::ng-deep .side-menu .p-panelmenu-header .p-panelmenu-header-content .p-panelmenu-header-action,
+.layout.collapsed :host ::ng-deep .side-menu .p-menuitem-link {
+  justify-content: center;
+  padding-left: .5rem;
+}
+.layout.collapsed :host ::ng-deep .side-menu .p-panelmenu-header .p-panelmenu-header-content .p-panelmenu-header-action::before,
+.layout.collapsed :host ::ng-deep .side-menu .p-menuitem-link::before { display: none; }
+
+/* responsive: sidebar colapsado en pantallas chicas */
 @media (max-width: 960px) {
-  .layout {
-    grid-template-columns: var(--sidebar-w-collapsed) 1fr;
-  }
+  .layout { grid-template-columns: 64px 1fr; }
+}
+:host {
+  --topbar-h: 56px;
+
+  /* 🔧 Fallbacks si el tema no montó variables */
+  --surface-ground: #f6f7f9;
+  --surface-section: #ffffff;
+  --surface-card: #ffffff;
+  --surface-border: #e5e7eb;
+  --text-color: #111827;
+
+  /* 🎨 tokens del sidebar (derivan de las anteriores) */
+  --sidebar-bg: var(--surface-ground);
+  --sidebar-item-bg: transparent;
+  --sidebar-item-hover-bg: var(--surface-hover, #eef2f7);
+  --sidebar-item-active-bg: var(--surface-card);
+  --sidebar-accent: var(--primary-color, #3b82f6);
+
+  display: block;
+  height: 100dvh;
 }

@@ -1,1 +1,56 @@
-<router-outlet></router-outlet>
+<header class="topbar">
+  <div class="left">
+    <button
+      pButton
+      type="button"
+      class="p-button-rounded p-button-text"
+      icon="pi pi-bars"
+      (click)="toggleSidebar()">
+    </button>
+
+    <a class="brand" routerLink="/home">
+      <i class="pi pi-database"></i> Proy+
+    </a>
+  </div>
+
+  <div class="right">
+    <!-- 🔆/🌙 Toggle dark -->
+    <p-button
+      [text]="true"
+      [rounded]="true"
+      (click)="toggleDarkMode()"
+      [icon]="isDark ? 'pi pi-sun' : 'pi pi-moon'">
+    </p-button>
+
+    <!-- 🔔 Notificaciones con badge -->
+    <p-button
+      [text]="true"
+      [rounded]="true"
+      icon="pi pi-bell"
+      [badge]="4"
+      badgeSeverity="danger">
+    </p-button>
+
+    <!-- 👤 Menú de usuario -->
+    <button
+      pButton
+      type="button"
+      class="user-btn p-button-text"
+      (click)="openUserMenu($event)">
+      <p-avatar label="A" shape="circle"></p-avatar>
+      <span class="user-name">Admin</span>
+      <i class="pi pi-chevron-down"></i>
+    </button>
+    <p-menu #userMenu [popup]="true" [model]="userItems"></p-menu>
+  </div>
+</header>
+
+<div class="layout" [class.collapsed]="sidebarCollapsed">
+  <aside class="sidebar">
+    <p-panelMenu [model]="sideModel" styleClass="side-menu"></p-panelMenu>
+  </aside>
+
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

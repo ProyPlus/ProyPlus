@@ -1,20 +1,57 @@
-/* Inputs y selects a full width */
-:host ::ng-deep .p-inputtext,
-:host ::ng-deep .p-password,
-:host ::ng-deep .p-multiselect {
+:host {
+  /* tokens base (se adaptan si activás .app-dark) */
+  --tbl-bg: var(--surface-card, #fff);
+  --tbl-text: var(--text-color, #111827);
+  --tbl-head-bg: color-mix(in oklab, var(--surface-card, #fff), #000 3%);
+  --tbl-border: var(--surface-border, #e5e7eb);
+}
+
+/* -------- Tablas nativas -------- */
+:host .content table,
+:host table {
   width: 100%;
+  border-collapse: collapse;
+  background: var(--tbl-bg);
+  color: var(--tbl-text);
 }
 
-.p-field > label {
-  display: block;
-  margin-bottom: 0.35rem;
-  font-weight: 500;
+:host thead th {
+  background: var(--tbl-head-bg);
+  color: var(--tbl-text);
+  border-bottom: 1px solid var(--tbl-border);
+  font-weight: 600;
 }
 
-.p-field-checkbox {
-  display: flex;
-  align-items: center;
+:host tbody tr {
+  background: var(--tbl-bg);
+  border-bottom: 1px solid var(--tbl-border);
 }
 
-.ml-2 { margin-left: .5rem; }
-.w-100 { width: 100%; }
+:host tbody tr:nth-child(even) {
+  background: color-mix(in oklab, var(--tbl-bg), #000 3%);
+}
+
+/* Si por accidente tenías .table-dark en el html, lo neutralizamos */
+:host .table-dark {
+  background: var(--tbl-bg) !important;
+  color: var(--tbl-text) !important;
+}
+
+/* -------- PrimeNG DataTable (si usás p-table) -------- */
+:host ::ng-deep .p-datatable {
+  background: transparent;
+  color: var(--tbl-text);
+}
+:host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
+  background: var(--tbl-head-bg);
+  color: var(--tbl-text);
+  border-color: var(--tbl-border);
+}
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr {
+  background: var(--tbl-bg);
+  color: var(--tbl-text);
+  border-color: var(--tbl-border);
+}
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr:nth-child(even) {
+  background: color-mix(in oklab, var(--tbl-bg), #000 3%);
+}
