@@ -3,16 +3,59 @@
 @tailwind utilities;
 
 /* =======================
-   TOKENS (Dark Azul)
+   TOKENS (modo CLARO por defecto)
    ======================= */
 :root {
-  /* Paleta base */
-  --pp-bg-0: #0e1a2b; /* fondo app */
-  --pp-bg-1: #132235; /* sidebar/topbar */
-  --pp-bg-2: #182a40; /* cards/containers */
-  --pp-bg-3: #1d314a; /* hover/borde */
-  --pp-text-0: #e7ecf6; /* texto principal */
-  --pp-text-1: #aab4c8; /* texto secundario */
+  /* Paleta base clara */
+  --pp-bg-0: #f7f8fa;   /* fondo app */
+  --pp-bg-1: #ffffff;   /* sidebar/topbar */
+  --pp-bg-2: #ffffff;   /* cards/containers */
+  --pp-bg-3: #eef2f7;   /* hover/borde */
+  --pp-text-0: #0f172a; /* texto principal */
+  --pp-text-1: #475569; /* texto secundario */
+
+  --pp-primary: #4e79ff;
+  --pp-success: #16a34a;
+  --pp-warning: #f59e0b;
+  --pp-danger:  #ef4444;
+  --pp-magenta: #a855f7;
+
+  --pp-border: rgba(0,0,0,0.08);
+  --pp-radius: 14px;
+  --pp-shadow: 0 2px 10px rgba(0,0,0,0.06);
+
+  /* Mapeo a tokens de PrimeNG (Lara/Aura) */
+  --surface-ground:  var(--pp-bg-0);
+  --surface-section: var(--pp-bg-1);
+  --surface-card:    var(--pp-bg-2);
+  --surface-overlay: var(--pp-bg-2);
+  --surface-hover:   var(--pp-bg-3);
+  --surface-border:  var(--pp-border);
+
+  --text-color:            var(--pp-text-0);
+  --text-color-secondary:  var(--pp-text-1);
+
+  --primary-color:           var(--pp-primary);
+  --primary-contrast-color:  #fff;
+
+  --border-radius: var(--pp-radius);
+}
+
+/* =======================
+   TOKENS (modo OSCURO)
+   Se activan cuando <html> o <body> tienen .app-dark
+   ======================= */
+/* =======================
+   TOKENS (Dark Azul)
+   ======================= */
+.app-dark {
+  /* Paleta base SOLO cuando hay modo oscuro */
+  --pp-bg-0: #0e1a2b;
+  --pp-bg-1: #132235;
+  --pp-bg-2: #182a40;
+  --pp-bg-3: #1d314a;
+  --pp-text-0: #e7ecf6;
+  --pp-text-1: #aab4c8;
 
   --pp-primary: #4e79ff;
   --pp-success: #27c281;
@@ -40,11 +83,14 @@
 
   --border-radius: var(--pp-radius);
 
-  /* opcional para utilidades propias */
+  /* utilidades propias */
   --brand: #0ea5e9;
 }
 
-/* Base */
+
+/* =======================
+   Base
+   ======================= */
 html, body { height: 100%; }
 body {
   margin: 0;
@@ -55,9 +101,7 @@ body {
 
 /* =======================
    Superficies PrimeNG
-   (estilo "card" oscuro)
    ======================= */
-/* NOTA: excluimos .p-panelmenu para que el menú lateral NO quede como card. */
 .p-card,
 .p-panel,
 .p-toolbar,
@@ -74,14 +118,10 @@ body {
   box-shadow: var(--pp-shadow);
 }
 
-/* Botones/Badges redondeados */
 .p-button, .p-tag, .p-badge { border-radius: 999px; }
 .p-button.p-button-danger { background: var(--pp-danger); border-color: var(--pp-danger); }
 
-/* =======================
-   PanelMenu (sidebar)
-   mismo color que el fondo
-   ======================= */
+/* PanelMenu */
 .p-panelmenu { background: transparent !important; border: 0 !important; }
 .p-panelmenu .p-panelmenu-header > a,
 .p-panelmenu .p-menuitem-link {
@@ -96,7 +136,7 @@ body {
 }
 
 /* =======================
-   DataTable – look unificado
+   DataTable unificada
    ======================= */
 .p-datatable {
   background: var(--pp-bg-2);
@@ -105,14 +145,12 @@ body {
   box-shadow: var(--pp-shadow);
 }
 
-/* Header limpio */
 .p-datatable .p-datatable-header {
   background: transparent;
   border: 0;
   padding: 0 0 1rem 0;
 }
 
-/* Encabezados y celdas */
 .p-datatable .p-datatable-thead > tr > th {
   background: var(--pp-bg-2);
   border-color: var(--pp-border);
@@ -122,7 +160,6 @@ body {
 .p-datatable .p-datatable-tbody > tr { background: var(--pp-bg-2); }
 .p-datatable .p-datatable-tbody > tr > td { border-color: var(--pp-border); }
 
-/* Texto claro en toda la tabla */
 .p-datatable,
 .p-datatable .p-datatable-thead > tr > th,
 .p-datatable .p-datatable-tbody > tr > td,
@@ -130,14 +167,12 @@ body {
   color: var(--text-color) !important;
 }
 
-/* Hover / selección con buen contraste */
 .p-datatable .p-datatable-tbody > tr:hover > td,
 .p-datatable .p-datatable-tbody > tr.p-highlight > td {
   background: var(--surface-hover) !important;
   color: var(--text-color) !important;
 }
 
-/* Inputs/Selects dentro de la tabla (filtros/buscadores) */
 .p-datatable .p-inputtext,
 .p-datatable .p-dropdown,
 .p-datatable .p-multiselect,
@@ -153,7 +188,7 @@ body {
 .p-inputtext::placeholder,
 .p-datatable .p-inputtext::placeholder { color: var(--pp-text-1); opacity: .9; }
 
-/* Paginator oscuro */
+/* Paginator */
 .p-paginator {
   color: var(--text-color) !important;
   background: transparent !important;
@@ -168,7 +203,7 @@ body {
 }
 
 /* =======================
-   Chips de estado/rol
+   Chips de estado
    ======================= */
 .p-tag { font-weight: 700; }
 .p-tag-success { background: rgba(39,194,129,.15); color: #6ce0b0; }
@@ -196,7 +231,7 @@ body {
 }
 
 /* =======================
-   Variantes opcionales de tabla
+   Variantes de tabla
    ======================= */
 .p-datatable.table--dense .p-datatable-thead > tr > th,
 .p-datatable.table--dense .p-datatable-tbody > tr > td {
@@ -209,74 +244,24 @@ body {
   background: inherit !important;
 }
 
-
-
-/* ====== Diseño global de tablas (modo claro/oscuro) ====== */
-/* Tokens de tabla: derivan de los tokens del tema Prime (—surface-*, —text-color) */
-:root {
-  --tbl-bg: var(--surface-card, #fff);
-  --tbl-text: var(--text-color, #111827);
-  --tbl-head-bg: color-mix(in oklab, var(--surface-card, #fff), #000 3%);
-  --tbl-border: var(--surface-border, #e5e7eb);
-  --tbl-row-alt-bg: color-mix(in oklab, var(--surface-card, #fff), #000 2%);
-  --tbl-row-hover-bg: color-mix(in oklab, var(--surface-card, #fff), #000 5%);
-}
-
-/* Dark mode: se activan cuando tengas .app-dark en <html> o <body> */
-.app-dark {
-  --tbl-bg: var(--surface-card, #0b1220);
-  --tbl-text: var(--text-color, #e5e7eb);
-  --tbl-head-bg: color-mix(in oklab, var(--surface-card, #0b1220), #fff 6%);
-  --tbl-border: color-mix(in oklab, var(--surface-border, #1f2937), #fff 15%);
-  --tbl-row-alt-bg: color-mix(in oklab, var(--surface-card, #0b1220), #fff 4%);
-  --tbl-row-hover-bg: color-mix(in oklab, var(--surface-card, #0b1220), #fff 8%);
-}
-
-/* ---------- Tablas nativas ---------- */
+/* =======================
+   Tablas nativas
+   ======================= */
 table {
   width: 100%;
   border-collapse: collapse;
-  background: var(--tbl-bg);
-  color: var(--tbl-text);
+  background: var(--tbl-bg, var(--surface-card));
+  color: var(--tbl-text, var(--text-color));
 }
 thead th {
-  background: var(--tbl-head-bg);
-  color: var(--tbl-text);
-  border-bottom: 1px solid var(--tbl-border);
+  background: var(--tbl-head-bg, var(--surface-card));
+  color: var(--tbl-text, var(--text-color));
+  border-bottom: 1px solid var(--tbl-border, var(--surface-border));
   font-weight: 600;
 }
 tbody tr {
-  background: var(--tbl-bg);
-  border-bottom: 1px solid var(--tbl-border);
+  background: var(--tbl-bg, var(--surface-card));
+  border-bottom: 1px solid var(--tbl-border, var(--surface-border));
 }
-tbody tr:nth-child(even) { background: var(--tbl-row-alt-bg); }
-tbody tr:hover { background: var(--tbl-row-hover-bg); }
-
-/* Neutraliza restos de clases tipo .table-dark */
-.table-dark { background: var(--tbl-bg) !important; color: var(--tbl-text) !important; }
-
-/* ---------- PrimeNG DataTable (p-table) ---------- */
-.p-datatable { background: transparent; color: var(--tbl-text); }
-
-.p-datatable .p-datatable-thead > tr > th {
-  background: var(--tbl-head-bg);
-  color: var(--tbl-text);
-  border-color: var(--tbl-border);
-  font-weight: 600;
-}
-
-.p-datatable .p-datatable-tbody > tr {
-  background: var(--tbl-bg);
-  color: var(--tbl-text);
-  border-color: var(--tbl-border);
-}
-.p-datatable .p-datatable-tbody > tr:nth-child(even) { background: var(--tbl-row-alt-bg); }
-.p-datatable .p-datatable-tbody > tr:hover { background: var(--tbl-row-hover-bg); }
-
-/* Densidad cómoda (opcional) */
-.p-datatable .p-datatable-thead > tr > th,
-.p-datatable .p-datatable-tbody > tr > td { padding: .75rem .75rem; }
-
-/* Si querés desactivar rayado en una tabla puntual, envolvela con .no-stripes */
-.no-stripes table tbody tr:nth-child(even),
-.no-stripes .p-datatable .p-datatable-tbody > tr:nth-child(even) { background: var(--tbl-bg) !important; }
+tbody tr:nth-child(even) { background: var(--tbl-row-alt-bg, #f9fafb); }
+tbody tr:hover { background: var(--tbl-row-hover-bg, #f3f4f6); }
