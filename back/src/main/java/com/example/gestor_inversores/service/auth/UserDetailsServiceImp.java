@@ -1,8 +1,8 @@
-package com.example.gestor_inversores.service;
+package com.example.gestor_inversores.service.auth;
 
 import com.example.gestor_inversores.dto.AuthLoginRequestDTO;
 import com.example.gestor_inversores.dto.AuthLoginResponseDTO;
-import com.example.gestor_inversores.model.UserSec;
+import com.example.gestor_inversores.model.User;
 import com.example.gestor_inversores.repository.IUserRepository;
 import com.example.gestor_inversores.utils.JwtUtils;
 import jakarta.validation.Valid;
@@ -10,10 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -38,7 +36,7 @@ public class UserDetailsServiceImp implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        UserSec userSec = userRepo.findUserEntityByUsername(username)
+        User userSec = userRepo.findUserEntityByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("El usuario " + username + "no fue encontrado"));
 
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
@@ -50,13 +48,16 @@ public class UserDetailsServiceImp implements UserDetailsService {
                 .flatMap(role -> role.getPermissionsList().stream())
                 .forEach(permission -> authorityList.add(new SimpleGrantedAuthority(permission.getPermissionName())));
 
-        return new User(userSec.getUsername(),
+        return new org.springframework.security.core.userdetails.User(
+                userSec.getUsername(),
                 userSec.getPassword(),
-                userSec.isEnabled(),
-                userSec.isAccountNotExpired(),
-                userSec.isCredentialNotExpired(),
-                userSec.isAccountNotLocked(),
-                authorityList);
+                Boolean.TRUE.equals(userSec.getEnabled()),
+                Boolean.TRUE.equals(userSec.getAccountNotExpired()),
+                Boolean.TRUE.equals(userSec.getCredentialNotExpired()),
+                Boolean.TRUE.equals(userSec.getAccountNotLocked()),
+                authorityList
+        );
+
     }
 
     public AuthLoginResponseDTO loginUser(@Valid AuthLoginRequestDTO authLoginRequestDTO) {

@@ -2,7 +2,7 @@ package com.example.gestor_inversores.controller;
 
 import com.example.gestor_inversores.dto.AuthLoginRequestDTO;
 import com.example.gestor_inversores.dto.AuthLoginResponseDTO;
-import com.example.gestor_inversores.service.UserDetailsServiceImp;
+import com.example.gestor_inversores.service.auth.UserDetailsServiceImp;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

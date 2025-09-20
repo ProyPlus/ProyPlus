@@ -1,7 +1,7 @@
 package com.example.gestor_inversores.repository;
 
 import com.example.gestor_inversores.model.PasswordResetToken;
-import com.example.gestor_inversores.model.UserSec;
+import com.example.gestor_inversores.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 public interface IPasswordResetTokenRepository extends JpaRepository<PasswordResetToken, Long> {
 
     PasswordResetToken findByToken(String token);
-    void deleteByUser(UserSec user);
+    void deleteByUser(User user);
 }

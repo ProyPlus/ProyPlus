@@ -1,4 +1,4 @@
-package com.example.gestor_inversores.service;
+package com.example.gestor_inversores.service.role;
 
 import com.example.gestor_inversores.model.Role;
 

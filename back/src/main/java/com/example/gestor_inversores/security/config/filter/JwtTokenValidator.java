@@ -1,6 +1,5 @@
 package com.example.gestor_inversores.security.config.filter;
 
-
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.gestor_inversores.utils.JwtUtils;
 import jakarta.servlet.FilterChain;

@@ -1,7 +1,7 @@
-package com.example.gestor_inversores.service;
+package com.example.gestor_inversores.service.auth;
 
 import com.example.gestor_inversores.model.PasswordResetToken;
-import com.example.gestor_inversores.model.UserSec;
+import com.example.gestor_inversores.model.User;
 import com.example.gestor_inversores.repository.IPasswordResetTokenRepository;
 import com.example.gestor_inversores.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +30,11 @@ public class PasswordResetService implements IPasswordResetService {
     @Override
     @Transactional
     public String createPasswordResetToken(String email) {
-        Optional<UserSec> userOptional = userRepository.findByEmail(email);
+        Optional<User> userOptional = userRepository.findByEmail(email);
         if (!userOptional.isPresent()) {
             return "No se encontró un usuario con ese correo.";
         }
-        UserSec user = userOptional.get();
+        User user = userOptional.get();
 
         tokenRepository.deleteByUser(user);
 
@@ -65,7 +65,7 @@ public class PasswordResetService implements IPasswordResetService {
             return "El token ha expirado. Por favor, solicita uno nuevo.";
         }
 
-        UserSec user = resetToken.getUser();
+        User user = resetToken.getUser();
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
@@ -74,7 +74,7 @@ public class PasswordResetService implements IPasswordResetService {
         return "Contraseña restablecida exitosamente.";
     }
 
-    private void sendPasswordResetEmail(UserSec user, String token) {
+    private void sendPasswordResetEmail(User user, String token) {
         SimpleMailMessage email = new SimpleMailMessage();
         email.setTo(user.getEmail());
         email.setSubject("Restablecer Contraseña");

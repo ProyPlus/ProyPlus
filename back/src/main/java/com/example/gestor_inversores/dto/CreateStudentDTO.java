@@ -1,26 +1,35 @@
-package com.example.gestor_inversores.model;
+package com.example.gestor_inversores.dto;
 
 import com.example.gestor_inversores.model.enums.DegreeStatus;
 import com.example.gestor_inversores.model.enums.University;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+        import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
-@Entity
-@Table(name = "students")
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
-public class Student extends User {
+@NoArgsConstructor
+public class CreateStudentDTO {
 
+    // ----- Campos de UserSec -----
+    @NotBlank(message = "El username es obligatorio")
+    @Size(min = 3, max = 50, message = "El username debe tener entre 3 y 50 caracteres")
+    private String username;
+
+    @NotBlank(message = "La contraseña es obligatoria")
+    @Size(min = 4, message = "La contraseña debe tener al menos 4 caracteres")
+    private String password;
+
+    @NotBlank(message = "El email es obligatorio")
+    @Email(message = "Email no válido")
+    private String email;
+
+    private String photoUrl;
+
+    // ----- Campos de Student -----
     @NotBlank(message = "El nombre es obligatorio")
     @Size(max = 100, message = "El nombre no puede superar 100 caracteres")
     private String firstName;
@@ -30,7 +39,6 @@ public class Student extends User {
     private String lastName;
 
     @NotBlank(message = "El DNI es obligatorio")
-    @Column(nullable = false, unique = true)
     @Size(max = 20, message = "El DNI no puede superar 20 caracteres")
     private String dni;
 
@@ -43,14 +51,12 @@ public class Student extends User {
     private LocalDate dateOfBirth;
 
     @NotNull(message = "La universidad es obligatoria")
-    @Enumerated(EnumType.STRING)
     private University university;
 
     @NotBlank(message = "La carrera es obligatoria")
     private String career;
 
     @NotNull(message = "El estado de la carrera es obligatorio")
-    @Enumerated(EnumType.STRING)
     private DegreeStatus degreeStatus;
 
     @Pattern(regexp = "^(https?://).*$", message = "Debe ser una URL válida")
@@ -59,17 +65,5 @@ public class Student extends User {
     @Size(max = 500, message = "La descripción puede tener hasta 500 caracteres")
     private String description;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id",referencedColumnName = "idAddress")
-    private Address address;
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "student_project",
-            joinColumns = @JoinColumn(name = "student_id"),
-            inverseJoinColumns = @JoinColumn(name = "project_id"))
-    private Set<Project> projectsList = new HashSet<>();
-
-    @OneToMany(mappedBy = "confirmedBy")
-    private Set<Investment> confirmedInvestments = new HashSet<>();
-
+    private AddressDTO address;
 }

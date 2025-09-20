@@ -1,6 +1,5 @@
 package com.example.gestor_inversores.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -19,9 +18,10 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Investor extends UserSec{
+public class Investor extends User {
 
     @NotBlank(message = "CUIT es obligatorio")
+    @Column(nullable = false, unique = true)
     @Size(min = 11, max = 11, message = "CUIT debe tener 11 caracteres")
     private String cuit;
 
@@ -35,7 +35,7 @@ public class Investor extends UserSec{
     @Size(max = 100, message = "El sitio web no puede superar 100 caracteres")
     private String webSite;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id",referencedColumnName = "idAddress")
     private Address address;
 

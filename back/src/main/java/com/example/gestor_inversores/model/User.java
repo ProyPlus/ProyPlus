@@ -1,6 +1,5 @@
 package com.example.gestor_inversores.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -20,7 +19,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-public class UserSec {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,10 +41,10 @@ public class UserSec {
 
     private String photoUrl;
 
-    private boolean enabled;
-    private boolean accountNotExpired;
-    private boolean accountNotLocked;
-    private boolean credentialNotExpired;
+    private Boolean enabled;
+    private Boolean accountNotExpired;
+    private Boolean accountNotLocked;
+    private Boolean credentialNotExpired;
 
     //No está en uso
     //private boolean mustChangePassword = false;

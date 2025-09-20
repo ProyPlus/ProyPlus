@@ -1,10 +1,9 @@
 package com.example.gestor_inversores.controller;
 
 import com.example.gestor_inversores.model.Permission;
-import com.example.gestor_inversores.service.IPermissionService;
+import com.example.gestor_inversores.service.permission.IPermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

@@ -1,7 +1,7 @@
 package com.example.gestor_inversores.controller;
 
 import com.example.gestor_inversores.dto.PasswordResetRequestDTO;
-import com.example.gestor_inversores.service.IPasswordResetService;
+import com.example.gestor_inversores.service.auth.IPasswordResetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

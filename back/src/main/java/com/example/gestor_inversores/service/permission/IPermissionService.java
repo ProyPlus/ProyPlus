@@ -1,4 +1,4 @@
-package com.example.gestor_inversores.service;
+package com.example.gestor_inversores.service.permission;
 
 import com.example.gestor_inversores.model.Permission;
 

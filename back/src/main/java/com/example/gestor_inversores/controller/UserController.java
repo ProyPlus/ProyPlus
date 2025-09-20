@@ -1,18 +1,18 @@
 package com.example.gestor_inversores.controller;
 
-import com.example.gestor_inversores.model.Role;
-import com.example.gestor_inversores.model.UserSec;
-import com.example.gestor_inversores.service.IRoleService;
-import com.example.gestor_inversores.service.IUserService;
+import com.example.gestor_inversores.dto.CreateUserDTO;
+import com.example.gestor_inversores.dto.PatchUserDTO;
+import com.example.gestor_inversores.dto.ResponseUserDTO;
+import com.example.gestor_inversores.mapper.UserMapper;
+import com.example.gestor_inversores.model.User;
+import com.example.gestor_inversores.service.user.IUserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/users")
@@ -22,48 +22,61 @@ public class UserController {
     private IUserService userService;
 
     @Autowired
-    private IRoleService roleService;
+    private UserMapper userMapper;
 
+    // GET ALL
     @GetMapping
-    //@PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public ResponseEntity<List<UserSec>> getAllUsers() {
-        List<UserSec> users = userService.findAll();
-        return ResponseEntity.ok(users);
+    public ResponseEntity<List<ResponseUserDTO>> getAllUsers() {
+        List<User> users = userService.findAll();
+
+        List<ResponseUserDTO> dtoList = users.stream()
+                .map(userMapper::userToResponseUserDTO)
+                .toList();
+
+        return ResponseEntity.ok(dtoList);
     }
 
+    // GET BY ID
     @GetMapping("/{id}")
-    //@PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public ResponseEntity<UserSec> getUserById(@PathVariable Long id) {
-        Optional<UserSec> user = userService.findById(id);
-        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<ResponseUserDTO> getUserById(@PathVariable Long id) {
+        return userService.findById(id)
+                .map(userMapper::userToResponseUserDTO)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    // CREATE
     @PostMapping
-    //@PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserSec> createUser(@RequestBody UserSec userSec) {
-
-        Set<Role> roleList = new HashSet<>();
-        Role readRole;
-
-        //Encriptar la contraseña
-        userSec.setPassword(userService.encriptPassword(userSec.getPassword()));
-
-        // Recuperar la Permission/s por su ID
-        for (Role role : userSec.getRolesList()) {
-            readRole = roleService.findById(role.getId()).orElse(null);
-            if (readRole != null) {
-                //si encuentro, guardo en la lista
-                roleList.add(readRole);
-            }
-        }
-
-        if (!roleList.isEmpty()) {
-            userSec.setRolesList(roleList);
-
-            UserSec newUser = userService.save(userSec);
-            return ResponseEntity.ok(newUser);
-        }
-        return null;
+    public ResponseEntity<ResponseUserDTO> createUser(@Valid @RequestBody CreateUserDTO requestDto) {
+        User user = userMapper.requestUserDTOToUser(requestDto);
+        User savedUser = userService.save(user);
+        ResponseUserDTO responseDto = userMapper.userToResponseUserDTO(savedUser);
+        return ResponseEntity.ok(responseDto);
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<ResponseUserDTO> patchUser(
+            @PathVariable Long id,
+            @Valid @RequestBody PatchUserDTO patchDto) {
+
+        Optional<User> updatedUser = userService.patchUser(id, patchDto);
+
+        return updatedUser
+                .map(user -> ResponseEntity.ok(userMapper.userToResponseUserDTO(user)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    // DAR DE ALTA (lógica)
+    @PatchMapping("/activate/{id}")
+    public ResponseEntity<ResponseUserDTO> activateUser(@PathVariable Long id) {
+        User updatedUser = userService.activateUser(id);
+        return ResponseEntity.ok(userMapper.userToResponseUserDTO(updatedUser));
+    }
+
+    // DAR DE BAJA (lógica)
+    @PatchMapping("/desactivate/{id}")
+    public ResponseEntity<ResponseUserDTO> desactivateUser(@PathVariable Long id) {
+        User updatedUser = userService.desactivateUser(id);
+        return ResponseEntity.ok(userMapper.userToResponseUserDTO(updatedUser));
+    }
 }
