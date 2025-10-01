@@ -1,5 +1,0 @@
-/* src/app/features/panel/panel.component.scss */
-:host { display: block; }
-header.sticky { backdrop-filter: blur(8px); }
-aside, header { -webkit-backdrop-filter: blur(8px); }
-.nav-link-active { /* si usás tailwind */ @apply bg-gray-900 text-white; }

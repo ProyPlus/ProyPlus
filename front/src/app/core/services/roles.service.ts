@@ -15,8 +15,7 @@ export interface IRole {
 
 @Injectable({ providedIn: 'root' })
 export class RolesService {
-  //private baseUrl = 'http://72.60.11.35:8080/api/roles';
-  private baseUrl = '/api/roles'; // <-- NO poner http://72.60.11.35:8080
+  private baseUrl = '/api/roles';
 
 
   constructor(private http: HttpClient) {}

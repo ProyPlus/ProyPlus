@@ -1,8 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./index.html", "./src/**/*.{html,ts}"],
-  // Hace que Tailwind use .app-dark como “dark root class”
-  darkMode: ["class", ".app-dark"],
+  content: ["./src/**/*.{html,ts}"],
+  darkMode: "class",
   theme: {
     extend: {
       colors: {

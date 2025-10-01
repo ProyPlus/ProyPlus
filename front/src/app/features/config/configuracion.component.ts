@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
 import { Card } from 'primeng/card';
 import { InputText } from 'primeng/inputtext';
-import { Button } from 'primeng/button';
+//import { Button } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 
 
 @Component({
   standalone: true,
   selector: 'app-configuracion',
-  imports: [Card, InputText, Button, FormsModule],
+  imports: [Card, InputText, FormsModule],
   template: `
     <p-card header="Configuración de usuario">
       <div class="field">

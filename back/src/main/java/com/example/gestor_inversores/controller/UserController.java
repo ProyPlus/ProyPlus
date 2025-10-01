@@ -1,7 +1,7 @@
 package com.example.gestor_inversores.controller;
 
-import com.example.gestor_inversores.dto.CreateUserDTO;
-import com.example.gestor_inversores.dto.PatchUserDTO;
+import com.example.gestor_inversores.dto.RequestUserDTO;
+import com.example.gestor_inversores.dto.RequestUserUpdateDTO;
 import com.example.gestor_inversores.dto.ResponseUserDTO;
 import com.example.gestor_inversores.mapper.UserMapper;
 import com.example.gestor_inversores.model.User;
@@ -47,7 +47,7 @@ public class UserController {
 
     // CREATE
     @PostMapping
-    public ResponseEntity<ResponseUserDTO> createUser(@Valid @RequestBody CreateUserDTO requestDto) {
+    public ResponseEntity<ResponseUserDTO> createUser(@Valid @RequestBody RequestUserDTO requestDto) {
         User user = userMapper.requestUserDTOToUser(requestDto);
         User savedUser = userService.save(user);
         ResponseUserDTO responseDto = userMapper.userToResponseUserDTO(savedUser);
@@ -57,7 +57,7 @@ public class UserController {
     @PatchMapping("/{id}")
     public ResponseEntity<ResponseUserDTO> patchUser(
             @PathVariable Long id,
-            @Valid @RequestBody PatchUserDTO patchDto) {
+            @Valid @RequestBody RequestUserUpdateDTO patchDto) {
 
         Optional<User> updatedUser = userService.patchUser(id, patchDto);
 

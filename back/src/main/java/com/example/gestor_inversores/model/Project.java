@@ -1,13 +1,17 @@
 package com.example.gestor_inversores.model;
 
+import com.example.gestor_inversores.model.enums.ProjectStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,6 +21,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Project {
 
     @Id
@@ -33,14 +38,15 @@ public class Project {
 
     @NotNull(message = "El presupuesto objetivo es obligatorio")
     @PositiveOrZero(message = "El presupuesto objetivo debe ser mayor o igual a cero")
-    private Double budgetGoal;
+    private BigDecimal budgetGoal;
 
     @NotNull(message = "El presupuesto actual es obligatorio")
     @PositiveOrZero(message = "El presupuesto actual debe ser mayor o igual a cero")
-    private Double currentGoal;
+    private BigDecimal currentGoal;
 
-    @NotBlank(message = "El estado del proyecto es obligatorio")
-    private String status;
+    @NotNull(message = "El estado del proyecto es obligatorio")
+    @Enumerated(EnumType.STRING)
+    private ProjectStatus status;
 
     @NotNull(message = "La fecha de inicio es obligatoria")
     private LocalDate startDate;
@@ -52,9 +58,11 @@ public class Project {
     private LocalDate endDate;
 
     @ManyToMany(mappedBy = "projectsList", fetch = FetchType.EAGER)
+    @Builder.Default
     private Set<Student> students = new HashSet<>();
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Builder.Default
     private Set<ProjectDocument> documents = new HashSet<>();
 
     @ManyToOne
@@ -62,9 +70,17 @@ public class Project {
     private ProjectTag projectTag;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    @Builder.Default
     private Set<Investment> investments = new HashSet<>();
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    @Builder.Default
     private Set<Earning> earnings = new HashSet<>();
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean deleted = false;
+    private LocalDateTime deletedAt;
 
 }

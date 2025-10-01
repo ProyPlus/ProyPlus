@@ -1,267 +1,110 @@
+/* Tailwind */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* =======================
-   TOKENS (modo CLARO por defecto)
-   ======================= */
-:root {
-  /* Paleta base clara */
-  --pp-bg-0: #f7f8fa;   /* fondo app */
-  --pp-bg-1: #ffffff;   /* sidebar/topbar */
-  --pp-bg-2: #ffffff;   /* cards/containers */
-  --pp-bg-3: #eef2f7;   /* hover/borde */
-  --pp-text-0: #0f172a; /* texto principal */
-  --pp-text-1: #475569; /* texto secundario */
+/* ===== PrimeNG (usa el theme que tengas instalado) =====
+   Si NO lo importás en angular.json, podés importarlo acá:
+   @import "primeng/resources/themes/lara-light-blue/theme.css";
+   @import "primeng/resources/primeng.min.css";
+*/
 
-  --pp-primary: #4e79ff;
-  --pp-success: #16a34a;
-  --pp-warning: #f59e0b;
-  --pp-danger:  #ef4444;
-  --pp-magenta: #a855f7;
-
-  --pp-border: rgba(0,0,0,0.08);
-  --pp-radius: 14px;
-  --pp-shadow: 0 2px 10px rgba(0,0,0,0.06);
-
-  /* Mapeo a tokens de PrimeNG (Lara/Aura) */
-  --surface-ground:  var(--pp-bg-0);
-  --surface-section: var(--pp-bg-1);
-  --surface-card:    var(--pp-bg-2);
-  --surface-overlay: var(--pp-bg-2);
-  --surface-hover:   var(--pp-bg-3);
-  --surface-border:  var(--pp-border);
-
-  --text-color:            var(--pp-text-0);
-  --text-color-secondary:  var(--pp-text-1);
-
-  --primary-color:           var(--pp-primary);
-  --primary-contrast-color:  #fff;
-
-  --border-radius: var(--pp-radius);
-}
-
-/* =======================
-   TOKENS (modo OSCURO)
-   Se activan cuando <html> o <body> tienen .app-dark
-   ======================= */
-/* =======================
-   TOKENS (Dark Azul)
-   ======================= */
-.app-dark {
-  /* Paleta base SOLO cuando hay modo oscuro */
-  --pp-bg-0: #0e1a2b;
-  --pp-bg-1: #132235;
-  --pp-bg-2: #182a40;
-  --pp-bg-3: #1d314a;
-  --pp-text-0: #e7ecf6;
-  --pp-text-1: #aab4c8;
-
-  --pp-primary: #4e79ff;
-  --pp-success: #27c281;
-  --pp-warning: #ffb02e;
-  --pp-danger:  #ff6464;
-  --pp-magenta: #a855f7;
-
-  --pp-border: rgba(255,255,255,0.06);
-  --pp-radius: 14px;
-  --pp-shadow: 0 2px 10px rgba(0,0,0,0.25);
-
-  /* Mapeo a tokens de tema Lara/Aura (PrimeNG 20) */
-  --surface-ground:  var(--pp-bg-0);
-  --surface-section: var(--pp-bg-1);
-  --surface-card:    var(--pp-bg-2);
-  --surface-overlay: var(--pp-bg-2);
-  --surface-hover:   var(--pp-bg-3);
-  --surface-border:  var(--pp-border);
-
-  --text-color:            var(--pp-text-0);
-  --text-color-secondary:  var(--pp-text-1);
-
-  --primary-color:           var(--pp-primary);
-  --primary-contrast-color:  #fff;
-
-  --border-radius: var(--pp-radius);
-
-  /* utilidades propias */
-  --brand: #0ea5e9;
-}
-
-
-/* =======================
-   Base
-   ======================= */
+/* Base mínima (no forzamos colores del tema) */
 html, body { height: 100%; }
 body {
   margin: 0;
   font-family: Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
-  background: var(--pp-bg-0);
-  color: var(--pp-text-0);
 }
 
-/* =======================
-   Superficies PrimeNG
-   ======================= */
-.p-card,
-.p-panel,
-.p-toolbar,
-.p-dialog .p-dialog-content,
-.p-dialog .p-dialog-header,
-.p-sidebar,
-.p-overlaypanel,
-.p-menu,
-.p-menubar,
-.p-megamenu {
-  background: var(--surface-card) !important;
-  border: 1px solid var(--surface-border) !important;
-  border-radius: var(--border-radius) !important;
-  box-shadow: var(--pp-shadow);
-}
-
-.p-button, .p-tag, .p-badge { border-radius: 999px; }
-.p-button.p-button-danger { background: var(--pp-danger); border-color: var(--pp-danger); }
-
-/* PanelMenu */
-.p-panelmenu { background: transparent !important; border: 0 !important; }
-.p-panelmenu .p-panelmenu-header > a,
-.p-panelmenu .p-menuitem-link {
-  background: transparent !important;
-  color: var(--text-color);
-  border: 1px solid var(--surface-border);
-  border-radius: 10px;
-}
-.p-panelmenu .p-panelmenu-header > a:hover,
-.p-panelmenu .p-menuitem-link:hover {
-  background: var(--surface-hover) !important;
-}
-
-/* =======================
-   DataTable unificada
-   ======================= */
-.p-datatable {
-  background: var(--pp-bg-2);
-  border: 1px solid var(--pp-border);
-  border-radius: var(--pp-radius);
-  box-shadow: var(--pp-shadow);
-}
-
-.p-datatable .p-datatable-header {
-  background: transparent;
-  border: 0;
-  padding: 0 0 1rem 0;
-}
-
-.p-datatable .p-datatable-thead > tr > th {
-  background: var(--pp-bg-2);
-  border-color: var(--pp-border);
-  color: var(--text-color-secondary);
-  font-weight: 600;
-}
-.p-datatable .p-datatable-tbody > tr { background: var(--pp-bg-2); }
-.p-datatable .p-datatable-tbody > tr > td { border-color: var(--pp-border); }
-
-.p-datatable,
-.p-datatable .p-datatable-thead > tr > th,
-.p-datatable .p-datatable-tbody > tr > td,
-.p-datatable .p-datatable-tfoot > tr > td {
-  color: var(--text-color) !important;
-}
-
-.p-datatable .p-datatable-tbody > tr:hover > td,
-.p-datatable .p-datatable-tbody > tr.p-highlight > td {
-  background: var(--surface-hover) !important;
-  color: var(--text-color) !important;
-}
-
-.p-datatable .p-inputtext,
-.p-datatable .p-dropdown,
-.p-datatable .p-multiselect,
-.p-inputtext,
-.p-inputtextarea,
-.p-dropdown,
-.p-multiselect,
-.p-calendar .p-inputtext {
-  background: var(--pp-bg-1);
-  color: var(--pp-text-0);
-  border: 1px solid var(--pp-border);
-}
-.p-inputtext::placeholder,
-.p-datatable .p-inputtext::placeholder { color: var(--pp-text-1); opacity: .9; }
-
-/* Paginator */
-.p-paginator {
-  color: var(--text-color) !important;
-  background: transparent !important;
-  border-top: 1px solid var(--surface-border);
-}
-.p-paginator .p-paginator-page,
-.p-paginator .p-paginator-next,
-.p-paginator .p-paginator-prev,
-.p-paginator .p-paginator-first,
-.p-paginator .p-paginator-last {
-  color: var(--text-color) !important;
-}
-
-/* =======================
-   Chips de estado
-   ======================= */
-.p-tag { font-weight: 700; }
-.p-tag-success { background: rgba(39,194,129,.15); color: #6ce0b0; }
-.p-tag-info    { background: rgba(78,121,255,.15); color: #9db4ff; }
-.p-tag-warning { background: rgba(255,176,46,.18); color: #ffd79a; }
-.p-tag-danger  { background: rgba(255,100,100,.18); color: #ffb3b3; }
-
-/* =======================
-   Helpers Tailwind (tiles KPI)
-   ======================= */
+/* -------- (Opcional) helpers para tiles con Tailwind -------- */
 @layer components {
   .tile {
     @apply flex items-center gap-3 p-4 rounded-xl;
-    background: var(--pp-bg-2);
-    border: 1px solid var(--pp-border);
   }
-  .tile-icon {
-    @apply grid place-items-center rounded-xl w-9 h-9 text-white;
-  }
-  .tile-icon--primary { background: var(--pp-primary); }
-  .tile-icon--success { background: var(--pp-success); }
-  .tile-icon--warning { background: var(--pp-warning); }
-  .tile-icon--magenta { background: var(--pp-magenta); }
+  .tile-icon { @apply grid place-items-center rounded-xl w-9 h-9 text-white; }
   .tile-value { @apply text-2xl font-bold; }
 }
 
-/* =======================
-   Variantes de tabla
-   ======================= */
-.p-datatable.table--dense .p-datatable-thead > tr > th,
-.p-datatable.table--dense .p-datatable-tbody > tr > td {
-  padding: .35rem .65rem;
+/* ====== (Opcional) Tema SUAVE para tablas, óptico pero sin romper PrimeNG ======
+   Usalo sólo si querés un hover un poco más suave que el default.
+   Para aplicarlo, envolvé tu tabla/p-table con <div class="pp-table">...</div>
+*/
+.pp-table {
+  /* Tablas nativas */
+  table { width: 100%; border-collapse: collapse; }
+  thead th { font-weight: 600; }
+
+  /* PrimeNG p-table: apenas ajustamos hover/alt rows sin tocar colores del theme */
+  .p-datatable .p-datatable-tbody > tr:nth-child(even) { 
+    background: color-mix(in oklab, var(--surface-card, #fff), #000 3%);
+  }
+  .p-datatable .p-datatable-tbody > tr:hover {
+    background: color-mix(in oklab, var(--surface-card, #fff), #000 5%) !important;
+  }
+  .p-datatable .p-datatable-tbody > tr.p-highlight:hover {
+    background: inherit !important; /* mantiene el seleccionado del theme */
+  }
 }
-.p-datatable.table--striped .p-datatable-tbody > tr:nth-child(even) {
-  background: color-mix(in oklab, var(--pp-bg-2), #000 5%);
-}
-.p-datatable.table--nohover .p-datatable-tbody > tr:hover {
-  background: inherit !important;
+/* ===== Hover animado para filas (nativas + PrimeNG) ===== */
+/* Funciona sin romper el tema y sin tocar colores del theme */
+.pp-table {
+  /* Nativas */
+  tbody tr > td {
+    position: relative;               /* para la barrita */
+    transition: background .18s ease, box-shadow .18s ease;
+    will-change: background, box-shadow;
+  }
+
+  /* color de hover muy sutil; ajusta el 5% si querés más/menos */
+  tbody tr:hover > td {
+    background: color-mix(in oklab, var(--surface-card, #fff), #000 5%);
+    box-shadow: inset 0 1px 0 rgba(0,0,0,.05), inset 0 -1px 0 rgba(0,0,0,.05);
+    z-index: 1;                        /* eleva visualmente la fila */
+  }
+
+  /* barrita izquierda de acento en la 1ra celda */
+  tbody tr:hover > td:first-child::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--primary-color, #2d86ff);
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+  }
+
+  /* PrimeNG p-table */
+  .p-datatable .p-datatable-tbody > tr > td {
+    position: relative;
+    transition: background .18s ease, box-shadow .18s ease;
+    will-change: background, box-shadow;
+  }
+  .p-datatable .p-datatable-tbody > tr:hover > td {
+    background: color-mix(in oklab, var(--surface-card, #fff), #000 5%) !important;
+    box-shadow: inset 0 1px 0 rgba(0,0,0,.05), inset 0 -1px 0 rgba(0,0,0,.05);
+    z-index: 1;
+  }
+  .p-datatable .p-datatable-tbody > tr:hover > td:first-child::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--primary-color, #2d86ff);
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+  }
+
+  /* Mantiene el color del seleccionado del theme, pero suma el énfasis */
+  .p-datatable .p-datatable-tbody > tr.p-highlight:hover > td {
+    background: inherit !important;
+    box-shadow: inset 0 1px 0 rgba(0,0,0,.08), inset 0 -1px 0 rgba(0,0,0,.08);
+  }
 }
 
-/* =======================
-   Tablas nativas
-   ======================= */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--tbl-bg, var(--surface-card));
-  color: var(--tbl-text, var(--text-color));
+/* Accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .pp-table tbody tr > td,
+  .pp-table .p-datatable .p-datatable-tbody > tr > td {
+    transition: none !important;
+  }
 }
-thead th {
-  background: var(--tbl-head-bg, var(--surface-card));
-  color: var(--tbl-text, var(--text-color));
-  border-bottom: 1px solid var(--tbl-border, var(--surface-border));
-  font-weight: 600;
-}
-tbody tr {
-  background: var(--tbl-bg, var(--surface-card));
-  border-bottom: 1px solid var(--tbl-border, var(--surface-border));
-}
-tbody tr:nth-child(even) { background: var(--tbl-row-alt-bg, #f9fafb); }
-tbody tr:hover { background: var(--tbl-row-hover-bg, #f3f4f6); }

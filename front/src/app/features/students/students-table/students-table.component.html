@@ -1,0 +1,258 @@
+<!-- src/app/features/estudiantes/estudiantes.component.html -->
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<!-- ===== Dialog de DETALLE (solo lectura) ===== -->
+<p-dialog
+  [(visible)]="showDetail"
+  [modal]="true"
+  [style]="{ width: '900px' }"
+  [breakpoints]="{ '1200px':'80vw', '960px':'90vw', '640px':'95vw' }"
+  [contentStyle]="{ 'max-height':'75vh', 'overflow':'auto' }"
+  [maximizable]="true"
+  [dismissableMask]="true"
+  header="Detalle de estudiante">
+
+  <ng-container *ngIf="selected">
+    <div class="flex items-center gap-3 mb-4">
+      <img *ngIf="selected.photoUrl"
+           [src]="selected.photoUrl" alt="foto"
+           class="w-12 h-12 rounded-full object-cover" />
+      <span *ngIf="!selected.photoUrl" class="pi pi-user text-2xl"></span>
+      <div>
+        <div class="text-lg font-semibold">{{ selected.username }}</div>
+        <div class="text-sm opacity-70">{{ selected.email }}</div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3">
+      <div><strong>ID:</strong> {{ selected.id }}</div>
+
+      <div class="col-span-2">
+        <strong>Roles:</strong>
+        <ng-container *ngIf="selected?.rolesList?.length; else noRolesDetail">
+          <p-tag
+            *ngFor="let r of selected.rolesList; let i = index"
+            [value]="r.role"
+            class="mr-1 mb-1"
+            [ngStyle]="tagStyle(r, i)">
+          </p-tag>
+        </ng-container>
+        <ng-template #noRolesDetail> — </ng-template>
+      </div>
+
+      <div><strong>Habilitado:</strong> {{ selected.enabled ? 'Sí' : 'No' }}</div>
+      <div><strong>Cuenta no expirada:</strong> {{ selected.accountNotExpired ? 'Sí' : 'No' }}</div>
+      <div><strong>No bloqueada:</strong> {{ selected.accountNotLocked ? 'Sí' : 'No' }}</div>
+      <div><strong>Credencial no expirada:</strong> {{ selected.credentialNotExpired ? 'Sí' : 'No' }}</div>
+    </div>
+
+    <p-divider></p-divider>
+
+    <!-- Extras académicos / personales (solo lectura si existen) -->
+    <div class="grid grid-cols-2 gap-3 text-sm">
+      <div><strong>Nombre:</strong> {{ selected.firstName || '—' }}</div>
+      <div><strong>Apellido:</strong> {{ selected.lastName || '—' }}</div>
+      <div><strong>DNI:</strong> {{ selected.dni || '—' }}</div>
+      <div><strong>Teléfono:</strong> {{ selected.phone || '—' }}</div>
+      <div><strong>Fecha nac.:</strong> {{ selected.dateOfBirth || '—' }}</div>
+      <div><strong>Universidad:</strong> {{ selected.university || '—' }}</div>
+      <div><strong>Carrera:</strong> {{ selected.career || '—' }}</div>
+      <div><strong>Estado grado:</strong> {{ selected.degreeStatus || '—' }}</div>
+      <div class="col-span-2"><strong>LinkedIn:</strong> <a *ngIf="selected.linkedinUrl" [href]="selected.linkedinUrl" target="_blank" rel="noopener">{{ selected.linkedinUrl }}</a><span *ngIf="!selected.linkedinUrl">—</span></div>
+      <div class="col-span-2"><strong>Descripción:</strong> {{ selected.description || '—' }}</div>
+
+      <div class="col-span-2">
+        <strong>Dirección:</strong>
+        <span *ngIf="selected.address; else noAddr">
+          {{ selected.address.street }} {{ selected.address.number }} - {{ selected.address.city }},
+          {{ selected.address.province }} ({{ selected.address.postalCode }})
+        </span>
+        <ng-template #noAddr>—</ng-template>
+      </div>
+    </div>
+
+    <p-divider></p-divider>
+    <details class="text-xs opacity-70">
+      <summary>Ver JSON</summary>
+      <pre class="whitespace-pre-wrap">{{ selected | json }}</pre>
+    </details>
+  </ng-container>
+</p-dialog>
+
+<!-- ===== Dialogo CREAR / EDITAR ===== -->
+<p-dialog [(visible)]="showDialog" [modal]="true"
+          [style]="{ width: '980px' }"
+          [breakpoints]="{ '1200px':'85vw','960px':'92vw','640px':'96vw' }"
+          [contentStyle]="{ 'max-height':'78vh','overflow':'auto' }"
+          [maximizable]="true"
+          [dismissableMask]="true"
+          [draggable]="false"
+          [closable]="true"
+          (onHide)="onDialogHide()"
+          [header]="isEdit ? 'Editar estudiante' : 'Nuevo estudiante'">
+
+  <p-divider class="my-4"></p-divider>
+
+  <form #frm="ngForm" (ngSubmit)="save(frm)" class="grid grid-cols-2 gap-3">
+    <!-- Usuario -->
+    <div class="col-span-2 sm:col-span-1">
+      <label class="block mb-1">Usuario <span class="text-red-500">*</span></label>
+      <input pInputText name="username" [(ngModel)]="formModel.username" required />
+    </div>
+
+    <!-- Email -->
+    <div class="col-span-2 sm:col-span-1">
+      <label class="block mb-1">Email <span class="text-red-500">*</span></label>
+      <input pInputText name="email" [(ngModel)]="formModel.email" required email />
+    </div>
+
+    <!-- Password -->
+    <div class="col-span-2 sm:col-span-1">
+      <label class="block mb-1">
+        {{ isEdit ? 'Password (dejar vacío para no cambiar)' : 'Password' }}
+        <span *ngIf="!isEdit" class="text-red-500">*</span>
+      </label>
+      <p-password
+        [feedback]="false"
+        [toggleMask]="true"
+        styleClass="w-full"
+        inputStyleClass="w-full"
+        name="password"
+        [(ngModel)]="formModel.password"
+        [required]="!isEdit">
+      </p-password>
+    </div>
+
+    <!-- Roles -->
+    <div class="col-span-2 sm:col-span-1">
+      <label class="block mb-1">Roles</label>
+      <p-multiSelect
+        [options]="availableRoles"
+        optionLabel="role"
+        placeholder="Seleccioná roles"
+        [(ngModel)]="selectedRoles"
+        name="roles"
+        [filter]="true"
+        [showClear]="true"
+        display="chip">
+        <ng-template let-opt pTemplate="item">
+          <div class="flex items-center gap-2">
+            <span class="pi pi-tag"></span>
+            <span>{{ opt.role }}</span>
+          </div>
+        </ng-template>
+      </p-multiSelect>
+    </div>
+
+    <!-- Flags -->
+    <div class="col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-3 items-center">
+      <div class="flex items-center gap-2">
+        <p-checkbox inputId="enabled" name="enabled" [(ngModel)]="formModel.enabled" [binary]="true"></p-checkbox>
+        <label for="enabled">Habilitado</label>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <p-checkbox inputId="accountNotExpired" name="accountNotExpired" [(ngModel)]="formModel.accountNotExpired" [binary]="true"></p-checkbox>
+        <label for="accountNotExpired">Cuenta no expirada</label>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <p-checkbox inputId="accountNotLocked" name="accountNotLocked" [(ngModel)]="formModel.accountNotLocked" [binary]="true"></p-checkbox>
+        <label for="accountNotLocked">No bloqueada</label>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <p-checkbox inputId="credentialNotExpired" name="credentialNotExpired" [(ngModel)]="formModel.credentialNotExpired" [binary]="true"></p-checkbox>
+        <label for="credentialNotExpired">Credencial no expirada</label>
+      </div>
+    </div>
+
+    <p-divider class="my-4"></p-divider>
+
+    <!-- Footer -->
+    <div class="col-span-2 flex justify-end gap-2 mt-2">
+      <button pButton type="button" label="Cancelar" class="p-button-text" (click)="showDialog=false"></button>
+      <button pButton type="submit" label="Guardar" icon="pi pi-check" [disabled]="frm.invalid || loading"></button>
+    </div>
+  </form>
+</p-dialog>
+
+<!-- ===== Toolbar (Agregar + Buscador) ===== -->
+<p-toolbar class="mb-3">
+  <div class="p-toolbar-group-left">
+    <button pButton label="Agregar nuevo" icon="pi pi-plus" (click)="openNew()"></button>
+  </div>
+
+  <div class="p-toolbar-group-right">
+    <span class="p-input-icon-left">
+      <i class="pi pi-search"></i>
+      <input
+        pInputText
+        type="text"
+        placeholder="Buscar..."
+        (input)="dt.filterGlobal($any($event.target).value, 'contains')" />
+    </span>
+  </div>
+</p-toolbar>
+
+<!-- ===== Tabla principal ===== -->
+<p-card header="Estudiantes" class="pp-table">
+  <p-table
+    #dt
+    [value]="students"
+    [loading]="loading"
+    dataKey="id"
+    [rowHover]="true"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[5,10,25,50]"
+    [globalFilterFields]="['username','email','rolesList.role']"
+    responsiveLayout="scroll">
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width:80px">ID</th>
+        <th>Usuario</th>
+        <th>Email</th>
+        <th>Roles</th>
+        <th style="width:220px; text-align:center">Acciones</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-row>
+      <tr>
+        <td class="text-right">{{ row.id }}</td>
+        <td>{{ row.username }}</td>
+        <td>{{ row.email }}</td>
+
+        <td>
+          <ng-container *ngIf="(row.rolesList || []).length; else noRolesRow">
+            <p-tag
+              *ngFor="let r of row.rolesList; let i = index"
+              [value]="r.role"
+              class="mr-1 mb-1"
+              [ngStyle]="tagStyle(r, i)">
+            </p-tag>
+          </ng-container>
+          <ng-template #noRolesRow>—</ng-template>
+        </td>
+
+        <td class="text-center whitespace-nowrap">
+          <div class="flex items-center justify-center gap-1">
+            <button pButton type="button" pTooltip="Ver" icon="pi pi-eye" [text]="true" [rounded]="true" [size]="'small'"
+              (click)="onView(row)"></button>
+
+            <button pButton type="button" pTooltip="Editar" icon="pi pi-pencil" severity="success" [text]="true" [rounded]="true" [size]="'small'"
+              (click)="edit(row)"></button>
+
+            <button *ngIf="row.enabled"  pButton type="button" pTooltip="Desactivar" icon="pi pi-ban" severity="warning" [text]="true" [rounded]="true" [size]="'small'"
+              (click)="toggleActive(row, false)"></button>
+            <button *ngIf="!row.enabled" pButton type="button" pTooltip="Activar"    icon="pi pi-check-circle" severity="success" [text]="true" [rounded]="true" [size]="'small'"
+              (click)="toggleActive(row, true)"></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-card>

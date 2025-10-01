@@ -1,8 +1,8 @@
 package com.example.gestor_inversores.mapper;
 
 import com.example.gestor_inversores.dto.AddressDTO;
-import com.example.gestor_inversores.dto.CreateInvestorDTO;
-import com.example.gestor_inversores.dto.PatchInvestorDTO;
+import com.example.gestor_inversores.dto.RequestInvestorDTO;
+import com.example.gestor_inversores.dto.RequestInvestorUpdateDTO;
 import com.example.gestor_inversores.dto.ResponseInvestorDTO;
 import com.example.gestor_inversores.model.Address;
 import com.example.gestor_inversores.model.Investor;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class InvestorMapper {
 
-    public Investor requestInvestorDTOtoInvestor(CreateInvestorDTO dto) {
+    public Investor requestInvestorDTOtoInvestor(RequestInvestorDTO dto) {
         if (dto == null) return null;
 
         Investor investor = new Investor();
@@ -72,7 +72,7 @@ public class InvestorMapper {
         return dto;
     }
 
-    public void patchInvestorFromDto(PatchInvestorDTO dto, Investor investor) {
+    public void patchInvestorFromDto(RequestInvestorUpdateDTO dto, Investor investor) {
         if (dto.getUsername() != null && !dto.getUsername().isBlank()) {
             investor.setUsername(dto.getUsername());
         }

@@ -1,22 +1,189 @@
 <p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
 
-<p-card header="Gestión de Roles">
-  <p-table [value]="roles" [loading]="loading" dataKey="id" responsiveLayout="scroll">
+<!-- ===== Dialogo DETALLE (solo lectura) ===== -->
+<p-dialog
+  [(visible)]="showDetail"
+  [modal]="true"
+  [style]="{ width: '800px' }"
+  [breakpoints]="{ '1200px':'80vw','960px':'90vw','640px':'95vw' }"
+  [contentStyle]="{ 'max-height':'75vh','overflow':'auto' }"
+  [maximizable]="true"
+  [dismissableMask]="true"
+  header="Detalle de rol">
+  <ng-container *ngIf="selected">
+    <div class="mb-2">
+      <div class="text-lg font-semibold">{{ selected.role }}</div>
+      <div class="text-sm opacity-70">ID: {{ selected.id }}</div>
+    </div>
+
+    <div class="mt-3">
+      <strong>Permisos:</strong>
+      <ng-container *ngIf="selected?.permissionsList?.length; else noPermsDetail">
+        <p-tag
+          *ngFor="let p of selected.permissionsList; let i = index"
+          [value]="displayPerm(p, i)"
+          class="mr-1 mb-1"
+          [ngStyle]="tagStyle(p, i)">
+        </p-tag>
+      </ng-container>
+      <ng-template #noPermsDetail> — </ng-template>
+    </div>
+
+    <p-divider></p-divider>
+
+    <details class="text-xs opacity-70">
+      <summary>Ver JSON</summary>
+      <pre class="whitespace-pre-wrap">{{ selected | json }}</pre>
+    </details>
+  </ng-container>
+</p-dialog>
+
+<!-- ===== Dialogo CREAR / EDITAR ===== -->
+<p-dialog
+  [(visible)]="showDialog"
+  [modal]="true"
+  [style]="{ width: '900px' }"
+  [breakpoints]="{ '1200px':'85vw','960px':'92vw','640px':'96vw' }"
+  [contentStyle]="{ 'max-height':'78vh','overflow':'auto' }"
+  [maximizable]="true"
+  [dismissableMask]="true"
+  [draggable]="false"
+  [closable]="true"
+  (onHide)="onDialogHide()"
+  [header]="isEdit ? 'Editar rol' : 'Nuevo rol'">
+
+  <p-divider class="my-4"></p-divider>
+
+  <form #frm="ngForm" (ngSubmit)="save(frm)" class="grid grid-cols-2 gap-3">
+    <!-- Nombre del rol -->
+    <div class="col-span-2 sm:col-span-1">
+      <label class="block mb-1">Nombre del rol <span class="text-red-500">*</span></label>
+      <input pInputText name="role" [(ngModel)]="formModel.role" required />
+    </div>
+
+    <!-- Permisos -->
+    <div class="col-span-2 sm:col-span-1">
+      <label class="block mb-1">Permisos</label>
+      <p-multiSelect
+        [options]="availablePermissions"
+        optionLabel="permissionName" 
+        placeholder="Seleccioná permisos"
+        [(ngModel)]="selectedPermissions"
+        name="permissions"
+        [filter]="true"
+        [showClear]="true"
+        display="chip">
+        <ng-template let-opt pTemplate="item">
+          <div class="flex items-center gap-2">
+            <span class="pi pi-key"></span>
+            <span>{{ opt.permissionName }}</span>
+          </div>
+        </ng-template>
+      </p-multiSelect>
+    </div>
+ <!-- linea -->
+
+  <p-divider class="my-4"></p-divider>
+
+  <br>
+    <!-- Footer -->
+    <div class="col-span-2 flex justify-end gap-2 mt-2">
+      <button pButton type="button" label="Cancelar" class="p-button-text" (click)="showDialog=false"></button>
+      <button pButton type="submit" label="Guardar" icon="pi pi-check" [disabled]="frm.invalid || loading"></button>
+    </div>
+  </form>
+</p-dialog>
+
+<!-- ===== Toolbar (Agregar + Buscador) ===== -->
+<p-toolbar class="mb-3">
+  <div class="p-toolbar-group-left">
+    <button pButton label="Agregar nuevo" icon="pi pi-plus" (click)="openNew()"></button>
+  </div>
+
+  <div class="p-toolbar-group-right">
+    <span class="p-input-icon-left">
+      <i class="pi pi-search"></i>
+      <input
+        pInputText
+        type="text"
+        placeholder="Buscar..."
+        (input)="dt.filterGlobal($any($event.target).value, 'contains')" />
+    </span>
+  </div>
+</p-toolbar>
+
+<!-- ===== Tabla principal ===== -->
+<p-card header="Roles" class="pp-table">
+  <p-table
+    #dt
+    [value]="roles"
+    [loading]="loading"
+    dataKey="id"
+    [rowHover]="true"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[5,10,25,50]"
+    [globalFilterFields]="[
+                          'role',
+                          'permissionsList.permissionName',
+                          'permissionsList.name',
+                          'permissionsList.label',
+                          'permissionsList.permission'
+                        ]"
+    responsiveLayout="scroll">
+
     <ng-template pTemplate="header">
       <tr>
-        <th>ID</th>
-        <th>Role</th>
-        <th>Permissions</th>
+        <th style="width:80px">ID</th>
+        <th>Rol</th>
+        <th>Permisos</th>
+        <th style="width:140px; text-align:center">Acciones</th>
       </tr>
     </ng-template>
+
     <ng-template pTemplate="body" let-row>
       <tr>
-        <td>{{ row.id }}</td>
+        <td class="text-right">{{ row.id }}</td>
         <td>{{ row.role }}</td>
+
+        <!-- Permisos como chips -->
         <td>
-          <p-tag *ngFor="let p of row.permissionsList" [value]="p.permissionName" class="mr-1"></p-tag>
+          <ng-container *ngIf="(row.permissionsList || []).length; else noPermsRow">
+            <p-tag
+              *ngFor="let p of row.permissionsList; let i = index"
+              [value]="displayPerm(p, i)"
+              class="mr-1 mb-1"
+              [ngStyle]="tagStyle(p, i)">
+            </p-tag>
+          </ng-container>
+          <ng-template #noPermsRow>—</ng-template>
+        </td>
+
+        <!-- Acciones -->
+        <td class="text-center whitespace-nowrap">
+          <div class="flex items-center justify-center gap-1">
+            <button
+              pButton type="button" pTooltip="Ver" aria-label="Ver"
+              icon="pi pi-eye" [text]="true" [rounded]="true" [size]="'small'"
+              (click)="onView(row)">
+            </button>
+
+            <button
+              pButton type="button" pTooltip="Editar" aria-label="Editar"
+              icon="pi pi-pencil" severity="success" [text]="true" [rounded]="true" [size]="'small'"
+              (click)="edit(row)">
+            </button>
+
+            <button
+              pButton type="button" pTooltip="Eliminar" aria-label="Eliminar"
+              icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true" [size]="'small'"
+              (click)="del(row)">
+            </button>
+          </div>
         </td>
       </tr>
     </ng-template>
+
   </p-table>
 </p-card>

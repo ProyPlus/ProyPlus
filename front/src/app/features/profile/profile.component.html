@@ -1,0 +1,49 @@
+<p-toast></p-toast>
+
+<p-card class="shadow-sm">
+  <div class="flex items-center justify-between">
+    <div>
+      <div class="text-xl font-semibold">Mi perfil</div>
+      <div class="text-sm opacity-70">Podés editar tu nombre, apellido y dirección. El email no es editable.</div>
+    </div>
+    <p-tag [value]="userType === 'STUDENT' ? 'Estudiante' : 'Inversor'"></p-tag>
+  </div>
+
+  <p-divider></p-divider>
+
+  <form [formGroup]="form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <label class="block text-sm mb-1">Nombre</label>
+      <input pInputText formControlName="firstName" [class.p-invalid]="form.controls.firstName.invalid && form.controls.firstName.touched" />
+      <small class="p-error" *ngIf="form.controls.firstName.invalid && form.controls.firstName.touched">
+        Ingresá un nombre válido
+      </small>
+    </div>
+
+    <div>
+      <label class="block text-sm mb-1">Apellido</label>
+      <input pInputText formControlName="lastName" [class.p-invalid]="form.controls.lastName.invalid && form.controls.lastName.touched" />
+      <small class="p-error" *ngIf="form.controls.lastName.invalid && form.controls.lastName.touched">
+        Ingresá un apellido válido
+      </small>
+    </div>
+
+    <div class="md:col-span-2">
+      <label class="block text-sm mb-1">Dirección</label>
+      <input pInputText formControlName="address" />
+    </div>
+
+    <div class="md:col-span-2">
+      <label class="block text-sm mb-1">Email</label>
+      <input pInputText formControlName="email" disabled />
+      <small class="opacity-70">No se puede modificar el email desde esta pantalla.</small>
+    </div>
+  </form>
+
+  <div class="mt-4 flex gap-2">
+    <button pButton type="button" label="Guardar cambios" icon="pi pi-save"
+            (click)="save()" [loading]="saving()" [disabled]="loading() || form.invalid"></button>
+    <button pButton type="button" label="Cancelar" icon="pi pi-undo" class="p-button-secondary"
+            (click)="loadProfile()" [disabled]="loading() || saving()"></button>
+  </div>
+</p-card>

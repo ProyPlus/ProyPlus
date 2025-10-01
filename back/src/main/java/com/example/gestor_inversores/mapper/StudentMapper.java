@@ -16,7 +16,7 @@ public class StudentMapper {
     @Autowired
     private IRoleService roleService;
 
-    public Student requestStudentDTOToStudent(CreateStudentDTO dto) {
+    public Student requestStudentDTOToStudent(RequestStudentDTO dto) {
         if (dto == null) return null;
 
         Student student = new Student();
@@ -107,7 +107,7 @@ public class StudentMapper {
         return dto;
     }
 
-    public void patchStudentFromDto(PatchStudentDTO dto, Student student) {
+    public void patchStudentFromDto(RequestStudentUpdateDTO dto, Student student) {
         if (dto == null || student == null) return;
 
         // Campos de User

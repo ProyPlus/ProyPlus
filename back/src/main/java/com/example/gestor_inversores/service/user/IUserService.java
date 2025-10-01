@@ -1,6 +1,6 @@
 package com.example.gestor_inversores.service.user;
 
-import com.example.gestor_inversores.dto.PatchUserDTO;
+import com.example.gestor_inversores.dto.RequestUserUpdateDTO;
 import com.example.gestor_inversores.model.User;
 
 import java.util.List;
@@ -16,7 +16,7 @@ public interface IUserService {
 
     void update(User userSec);
 
-    Optional<User> patchUser(Long id, PatchUserDTO patchDto);
+    Optional<User> patchUser(Long id, RequestUserUpdateDTO patchDto);
 
     void deleteById(Long id);
 

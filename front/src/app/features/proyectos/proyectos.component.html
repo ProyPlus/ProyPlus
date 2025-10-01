@@ -1,69 +1,117 @@
+<p-toast></p-toast>
 <div class="container">
   <div class="form-card">
     <div class="header">
       <img src="https://cdn-icons-png.flaticon.com/512/5956/5956592.png" alt="Proyect Logo" class="logo">
       <div class="user-icon">👤</div>
     </div>
+
     <h2>Crear nuevo proyecto</h2>
 
-    <form [formGroup]="projectForm" >
+    <form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
-        <label for="projectTitle">Titulo del proyecto</label>
-        <input type="text" id="projectTitle" placeholder="Enter project title" formControlName="title">
+        <label for="projectName">Nombre del proyecto</label>
+        <input type="text"
+       id="projectName"
+       placeholder="Ingresá el nombre (3–80 caracteres)"
+       maxlength="80"
+       formControlName="name" />
       </div>
+
       <div class="form-group">
-        <label for="projectDescription">Descripción del proyecto</label>
-        <textarea id="projectDescription" placeholder="Provide a detailed description of your project" formControlName="description"></textarea>
+        <label for="projectDescription">Descripción</label>
+        <textarea id="projectDescription"
+          placeholder="Descripción del proyecto (10–500 caracteres)"
+          maxlength="500"
+          formControlName="description"></textarea>
       </div>
+      <small class="error-text"
+        *ngIf="projectForm.get('description')?.errors?.['server']">
+        {{ projectForm.get('description')?.errors?.['server'] }}
+      </small>
+
+      <div class="form-group">
+        <label for="budgetGoal">Meta de presupuesto (USD)</label>
+        <input type="number" id="budgetGoal" placeholder="Ej: 150000" step="0.01" min="0" formControlName="budgetGoal" />
+      </div>
+
       <div class="form-group">
         <label for="projectStatus">Estado</label>
         <select id="projectStatus" formControlName="status">
-          <option value="" disabled selected>Seleccione un estado</option>
-          <option value="IN_PROGRESS">En progreso</option>
+          <option value="" disabled>Seleccione un estado</option>
           <option value="PENDING_FUNDING">Financiamiento pendiente</option>
+          <option value="IN_PROGRESS">En progreso</option>
           <option value="COMPLETED">Completado</option>
         </select>
       </div>
+
       <div class="form-group">
-        <label for="projectObjective">**Objetivo**</label>
-        <textarea id="projectObjective" placeholder="Define el objetivo del proyecto" formControlName="objective"></textarea>
+        <label for="startDate">Fecha de inicio</label>
+        <input type="date" id="startDate" formControlName="startDate" />
       </div>
+
       <div class="form-group">
-        <label for="startDate">**Fecha de Inicio Estimada**</label>
-        <input type="date" id="startDate" formControlName="startDate">
+        <label for="estimatedEndDate">Fecha de finalización estimada</label>
+        <input type="date" id="estimatedEndDate" formControlName="estimatedEndDate" />
       </div>
+      <small class="error-text"
+        *ngIf="projectForm.get('estimatedEndDate')?.errors?.['server']">
+        {{ projectForm.get('estimatedEndDate')?.errors?.['server'] }}
+      </small>
+
+      <!-- Responsable -->
       <div class="form-group">
-        <label for="endDate">**Fecha de Finalización Estimada**</label>
-        <input type="date" id="endDate" formControlName="endDate">
-      </div>
-      <div class="form-group">
-        <label for="creatorName">**Creador**</label>
-        <input type="text" id="creatorName" placeholder="Nombre del creador" formControlName="creator">
-      </div>
-      <div class="form-group">
-        <label>Subir archivos & Fotos</label>
-        <div class="upload-section">
-          <div class="drop-zone" (click)="fileInput.click()" (drop)="onFileDrop($event)" (dragover)="onDragOver($event)">
-            <div class="drop-zone-content">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon">
-                <path d="M16 11H8V8h8v3zm-4 7h-2v2h2v-2zm8 0h-2v2h2v-2zm-6 0h-2v2h2v-2zm-6 0h-2v2h2v-2zM4 18h2v2H4v-2zm0-4h2v2H4v-2zm0-4h2v2H4v-2zm0-4h2v2H4V6zm4 0h2v2H8V6zm4 0h2v2h-2V6zm4 0h2v2h-2V6zm4 0h2v2h-2V6zM6 4h12v2H6V4zm-2 0h2v2H4V4zm0 14h2v2H4v-2z"/>
-              </svg>
-              <p>Arrastre o haga click aqui para subir</p>
-            </div>
-            <input type="file" #fileInput (change)="onFileSelect($event)" multiple hidden>
-          </div>
-          <div class="file-preview">
-            <p *ngIf="!selectedFile">File Preview</p>
-            <img [src]="selectedFile.url" *ngIf="selectedFile" alt="Preview" class="preview-image">
-          </div>
+        <label for="owner">Responsable</label>
+        <div class="p-input-icon-right w-full">
+          <i *ngIf="ownerLoading" class="pi pi-spinner pi-spin"></i>
+          <p-autoComplete
+            inputId="owner"
+            formControlName="owner"
+            [dropdown]="true"
+            [suggestions]="suggestionsOwners"
+            (completeMethod)="completeOwner($event)"
+            (onDropdownClick)="showAllOwners()"
+            [minLength]="0"
+            [forceSelection]="true"
+            [appendTo]="'body'"
+            [dataKey]="'id'"
+            optionLabel="fullName">
+          </p-autoComplete>
         </div>
+        <small class="hint">Buscá por nombre y elegí el responsable.</small>
       </div>
+
+      <!-- Integrantes -->
+      <div class="form-group">
+        <label for="students">Estudiantes</label>
+        <div class="p-input-icon-right w-full">
+          <i *ngIf="studentsLoading" class="pi pi-spinner pi-spin"></i>
+          <p-autoComplete
+            inputId="students"
+            formControlName="students"
+            [multiple]="true"
+            [dropdown]="true"
+            [suggestions]="suggestionsStudents"
+            (completeMethod)="completeStudents($event)"
+            (onDropdownClick)="showAllStudents()"
+            [minLength]="0"
+            [delay]="200"
+            [forceSelection]="true"
+            [appendTo]="'body'"
+            [dataKey]="'id'"
+            optionLabel="fullName">
+          </p-autoComplete>
+        </div>
+        <small class="hint">Agregá varios integrantes por nombre.</small>
+      </div>
+
       <div class="actions">
-        <button type="button" class="cancel-button">Cancelar</button>
-        <button type="submit" class="create-button" [disabled]="!projectForm.valid" (click)="onSubmit()">Crear</button>
+        <button type="button" class="cancel-button" (click)="onCancel()">Cancelar</button>
+        <button type="submit" class="create-button" [disabled]="projectForm.invalid || isLoading">Crear</button>
       </div>
     </form>
-    
+
+    <!-- Overlay de carga -->
     <div class="loading-overlay" *ngIf="isLoading">
       <div class="loading-content">
         <h3>Creando proyecto...</h3>

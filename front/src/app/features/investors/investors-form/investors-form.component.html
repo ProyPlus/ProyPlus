@@ -1,0 +1,84 @@
+<h2 class="form-title">Nuevo Inversor</h2>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
+
+  <label>Username
+    <input formControlName="username" class="form-input"/>
+    <p class="form-error" *ngIf="getFieldError('username')">{{ getFieldError('username') }}</p>
+    <p class="form-error" *ngIf="usernameError()">{{ usernameError() }}</p>
+  </label>
+
+  <label>Password
+    <input type="password" formControlName="password" class="form-input"/>
+    <p class="form-error" *ngIf="getFieldError('password')">{{ getFieldError('password') }}</p>
+  </label>
+
+  <label>Email
+    <input formControlName="email" class="form-input"/>
+    <p class="form-error" *ngIf="getFieldError('email')">{{ getFieldError('email') }}</p>
+    <p class="form-error" *ngIf="emailError()">{{ emailError() }}</p>
+  </label>
+
+  <label>CUIT
+    <input formControlName="cuit" class="form-input"/>
+    <p class="form-error" *ngIf="getFieldError('cuit')">{{ getFieldError('cuit') }}</p>
+    <p class="form-error" *ngIf="cuitError()">{{ cuitError() }}</p>
+  </label>
+
+  <label>Persona de Contacto
+    <input formControlName="contactPerson" class="form-input"/>
+    <p class="form-error" *ngIf="getFieldError('contactPerson')">{{ getFieldError('contactPerson') }}</p>
+  </label>
+
+  <label>Teléfono
+    <input formControlName="phone" class="form-input"/>
+    <p class="form-error" *ngIf="getFieldError('phone')">{{ getFieldError('phone') }}</p>
+  </label>
+
+  <label>Sitio Web
+    <input formControlName="webSite" class="form-input"/>
+    <p class="form-error" *ngIf="getFieldError('webSite')">{{ getFieldError('webSite') }}</p>
+  </label>
+
+  <fieldset class="form-fieldset">
+    <legend>Dirección</legend>
+
+    <label>Calle
+      <input formControlName="street" class="form-input"/>
+      <p class="form-error" *ngIf="getFieldError('street')">{{ getFieldError('street') }}</p>
+    </label>
+
+    <label>Número
+      <input type="number" formControlName="number" class="form-input"/>
+      <p class="form-error" *ngIf="getFieldError('number')">{{ getFieldError('number') }}</p>
+    </label>
+
+    <label>Ciudad
+      <input formControlName="city" class="form-input"/>
+      <p class="form-error" *ngIf="getFieldError('city')">{{ getFieldError('city') }}</p>
+    </label>
+
+    <label>Provincia
+      <select formControlName="province" class="form-input">
+        <option value="" disabled selected>Seleccione Provincia</option>
+        <option *ngFor="let p of provinces" [value]="p">{{ p }}</option>
+      </select>
+      <p class="form-error" *ngIf="getFieldError('province')">{{ getFieldError('province') }}</p>
+    </label>
+
+    <label>Código Postal
+      <input type="number" formControlName="postalCode" class="form-input"/>
+      <p class="form-error" *ngIf="getFieldError('postalCode')">{{ getFieldError('postalCode') }}</p>
+    </label>
+  </fieldset>
+
+  <button type="submit" class="btn-primary">Guardar</button>
+  <p *ngIf="successMessage()" class="form-success">{{ successMessage() }}</p>
+</form>
+
+<div *ngIf="showModal()" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-xl p-6 w-80 text-center shadow-2xl">
+    <h2 class="text-xl font-bold mb-2">¡Registrado correctamente!</h2>
+    <p class="text-gray-600">Redirigiendo a Home…</p>
+  </div>
+</div>

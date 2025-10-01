@@ -65,14 +65,21 @@ public class UserDetailsServiceImp implements UserDetailsService {
         String username = authLoginRequestDTO.username();
         String password = authLoginRequestDTO.password();
 
+        // Autenticar
         Authentication authentication = this.authenticate(username, password);
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String accessToken = jwtUtils.createToken(authentication);
-        AuthLoginResponseDTO authLoginResponseDTO = new AuthLoginResponseDTO(username, "Login successfull", accessToken, true);
-        return authLoginResponseDTO;
 
+        // Generar JWT
+        String accessToken = jwtUtils.createToken(authentication);
+
+        // Traer el usuario de la DB para obtener su ID
+        User user = userRepo.findUserEntityByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("El usuario " + username + " no fue encontrado"));
+
+        // Retornar DTO con ID incluido
+        return new AuthLoginResponseDTO(user.getId(), username, "Login successful", accessToken, true);
     }
+
 
     public Authentication authenticate(String username, String password) {
 

@@ -229,7 +229,7 @@ export class LoginComponent {
     const { username, password } = this.form.getRawValue();
 
     this.auth.login(username!, password!).subscribe({
-      next: () => this.router.navigateByUrl("/home", { replaceUrl: true }),
+      next: () => this.router.navigateByUrl("/dashboard", { replaceUrl: true }),
       error: (err) => {
         console.error("Login error:", err);
         this.error.set(true);

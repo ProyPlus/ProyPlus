@@ -1,8 +1,9 @@
 package com.example.gestor_inversores.controller;
 
-import com.example.gestor_inversores.dto.PatchStudentDTO;
-import com.example.gestor_inversores.dto.CreateStudentDTO;
+import com.example.gestor_inversores.dto.RequestStudentUpdateDTO;
+import com.example.gestor_inversores.dto.RequestStudentDTO;
 import com.example.gestor_inversores.dto.ResponseStudentDTO;
+import com.example.gestor_inversores.dto.ResponseStudentNameDTO;
 import com.example.gestor_inversores.mapper.StudentMapper;
 import com.example.gestor_inversores.model.Student;
 import com.example.gestor_inversores.service.student.IStudentService;
@@ -38,8 +39,15 @@ public class StudentController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    //Para poder mostrar la lista de alumnos cuando alguien crea un proyecto
+    @GetMapping("/names")
+    public ResponseEntity<List<ResponseStudentNameDTO>> getAllStudentNames() {
+        List<ResponseStudentNameDTO> students = studentService.findAllStudentNames();
+        return ResponseEntity.ok(students);
+    }
+
     @PostMapping
-    public ResponseEntity<ResponseStudentDTO> createStudent(@Valid @RequestBody CreateStudentDTO requestDTO) {
+    public ResponseEntity<ResponseStudentDTO> createStudent(@Valid @RequestBody RequestStudentDTO requestDTO) {
         Student saved = studentService.save(requestDTO);
         return ResponseEntity.ok(StudentMapper.studentToResponseStudentDTO(saved));
     }
@@ -47,7 +55,7 @@ public class StudentController {
     @PatchMapping("/{id}")
     public ResponseEntity<ResponseStudentDTO> patchStudent(
             @PathVariable Long id,
-            @RequestBody PatchStudentDTO patchDto) {
+            @RequestBody RequestStudentUpdateDTO patchDto) {
 
         return studentService.patchStudent(id, patchDto)
                 .map(StudentMapper::studentToResponseStudentDTO)
@@ -64,7 +72,7 @@ public class StudentController {
 
     // DAR DE BAJA (disable)
     @PatchMapping("/desactivate/{id}")
-    public ResponseEntity<ResponseStudentDTO> deactivateStudent(@PathVariable Long id) {
+    public ResponseEntity<ResponseStudentDTO> desactivateStudent(@PathVariable Long id) {
         Student student = studentService.desactivateStudent(id);
         return ResponseEntity.ok(StudentMapper.studentToResponseStudentDTO(student));
     }

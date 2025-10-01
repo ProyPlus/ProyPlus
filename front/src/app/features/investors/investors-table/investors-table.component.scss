@@ -1,0 +1,4 @@
+:host { display: block; padding: 1rem; }
+.id-col { text-align: right; width: 80px; }
+/* tags redondeados y bold como en Usuarios/Estudiantes */
+:host ::ng-deep .p-tag { font-weight: 700; border-radius: 8px; }

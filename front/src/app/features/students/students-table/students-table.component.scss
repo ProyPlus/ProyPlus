@@ -1,0 +1,17 @@
+/* src/app/features/estudiantes/estudiantes.component.scss */
+:host { display: block; padding: 1rem; }
+
+.id-col { text-align: right; width: 80px; }
+
+:host ::ng-deep .p-tag.tag-green  { background: var(--green-500);  color: var(--surface-0); border-color: transparent; }
+:host ::ng-deep .p-tag.tag-blue   { background: var(--blue-500);   color: var(--surface-0); border-color: transparent; }
+:host ::ng-deep .p-tag.tag-orange { background: var(--orange-500); color: var(--surface-0); border-color: transparent; }
+:host ::ng-deep .p-tag.tag-red    { background: var(--red-500);    color: var(--surface-0); border-color: transparent; }
+:host ::ng-deep .p-tag.tag-purple { background: var(--purple-500); color: var(--surface-0); border-color: transparent; }
+:host ::ng-deep .p-tag.tag-teal   { background: var(--teal-500);   color: var(--surface-0); border-color: transparent; }
+:host ::ng-deep .p-tag.tag-cyan   { background: var(--cyan-500);   color: var(--surface-0); border-color: transparent; }
+
+:host ::ng-deep .p-tag {
+  font-weight: 700;
+  border-radius: 8px;
+}

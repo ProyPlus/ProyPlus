@@ -1,0 +1,157 @@
+<p-toast></p-toast>
+
+<!-- Header + acciones -->
+<div class="flex items-center justify-between mb-4">
+  <h2 class="text-2xl font-semibold">Dashboard</h2>
+  <div class="flex items-center gap-2">
+    <button pButton type="button" label="Refrescar" icon="pi pi-refresh" (click)="reload()" [disabled]="loading"></button>
+  </div>
+</div>
+
+<!-- KPIs -->
+<div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-3">
+  <p-card class="shadow-sm">
+    <div class="flex items-center gap-3">
+      <span class="pi pi-users text-2xl opacity-80"></span>
+      <div>
+        <div class="text-xs opacity-70">Usuarios</div>
+        <div class="text-xl font-bold">{{ kpis.totalUsers }}</div>
+      </div>
+    </div>
+  </p-card>
+
+  <p-card class="shadow-sm">
+    <div class="flex items-center gap-3">
+      <span class="pi pi-id-card text-2xl opacity-80"></span>
+      <div>
+        <div class="text-xs opacity-70">Estudiantes</div>
+        <div class="text-xl font-bold">{{ kpis.totalStudents }}</div>
+      </div>
+    </div>
+  </p-card>
+
+  <p-card class="shadow-sm">
+    <div class="flex items-center gap-3">
+      <span class="pi pi-briefcase text-2xl opacity-80"></span>
+      <div>
+        <div class="text-xs opacity-70">Inversores</div>
+        <div class="text-xl font-bold">{{ kpis.totalInvestors }}</div>
+      </div>
+    </div>
+  </p-card>
+
+  <p-card class="shadow-sm">
+    <div class="flex items-center gap-3">
+      <span class="pi pi-check-circle text-2xl opacity-80"></span>
+      <div>
+        <div class="text-xs opacity-70">Estudiantes activos</div>
+        <div class="text-xl font-bold">{{ kpis.activeStudents }}</div>
+      </div>
+    </div>
+  </p-card>
+
+  <p-card class="shadow-sm">
+    <div class="flex items-center gap-3">
+      <span class="pi pi-ban text-2xl opacity-80"></span>
+      <div>
+        <div class="text-xs opacity-70">Estudiantes inactivos</div>
+        <div class="text-xl font-bold">{{ kpis.inactiveStudents }}</div>
+      </div>
+    </div>
+  </p-card>
+
+  <p-card class="shadow-sm">
+    <div class="flex items-center gap-3">
+      <span class="pi pi-building text-2xl opacity-80"></span>
+      <div>
+        <div class="text-xs opacity-70">Inversores activos</div>
+        <div class="text-xl font-bold">{{ kpis.activeInvestors }}</div>
+      </div>
+    </div>
+  </p-card>
+</div>
+
+
+
+<!-- Grids con gráficas y “listas rápidas” -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-4 mt-4">
+
+  <!-- Donut: Estudiantes por estado de grado -->
+  <p-card class="shadow-sm xl:col-span-1" header="Estudiantes por estado de grado">
+    <p-chart
+      *ngIf="chartsEnabled"
+      type="doughnut"
+      [data]="studentsByDegreeData"
+      [options]="chartOptions"
+      style="height: 280px">
+    </p-chart>
+    <div class="text-sm opacity-70" *ngIf="!chartsEnabled">
+      Activá las gráficas para ver la distribución (IN_PROGRESS, COMPLETED, …).
+    </div>
+  </p-card>
+
+  <!-- Barras: Usuarios por rol -->
+  <p-card class="shadow-sm xl:col-span-2" header="Usuarios por rol">
+    <p-chart
+      *ngIf="chartsEnabled"
+      type="bar"
+      [data]="usersByRoleData"
+      [options]="chartOptions"
+      style="height: 280px">
+    </p-chart>
+    <div class="text-sm opacity-70" *ngIf="!chartsEnabled">
+      Activá las gráficas para ver cuántos usuarios hay por rol (ADMIN, STUDENT, INVESTOR, …).
+    </div>
+  </p-card>
+
+  <!-- Barras: Estudiantes por universidad -->
+  <p-card class="shadow-sm" header="Estudiantes por universidad">
+    <p-chart
+      *ngIf="chartsEnabled"
+      type="bar"
+      [data]="universitiesData"
+      [options]="chartOptions"
+      style="height: 280px">
+    </p-chart>
+    <div class="text-sm opacity-70" *ngIf="!chartsEnabled">
+      Activá las gráficas para ver la cantidad por universidad (UNLZ, UBA, …).
+    </div>
+  </p-card>
+
+  <!-- Quick lists -->
+  <p-card class="shadow-sm" header="Últimos registros (muestra)">
+    <div class="grid grid-cols-2 gap-3 text-sm">
+      <div>
+        <div class="font-semibold mb-2">Estudiantes</div>
+        <ul class="space-y-1 max-h-48 overflow-auto pr-2">
+          <li *ngFor="let s of students | slice:0:6">
+            <span class="pi pi-user mr-1 opacity-60"></span>
+            {{ s.username }} <span class="opacity-60">· {{ s.email }}</span>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-semibold mb-2">Inversores</div>
+        <ul class="space-y-1 max-h-48 overflow-auto pr-2">
+          <li *ngFor="let i of investors | slice:0:6">
+            <span class="pi pi-briefcase mr-1 opacity-60"></span>
+            {{ i.username }} <span class="opacity-60">· {{ i.email }}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </p-card>
+</div>
+<!-- Línea de tiempo de Proyectos -->
+<p-card class="mt-4 shadow-sm" header="Evolución de proyectos (últimos 12 meses)">
+  <p-chart
+    *ngIf="chartsEnabled && projectsTimelineData"
+    type="line"
+    [data]="projectsTimelineData"
+    [options]="projectsLineOptions"
+    class="h-[30rem]">
+  </p-chart>
+  <div class="text-sm opacity-70" *ngIf="!chartsEnabled">
+    Activá las gráficas para ver la evolución mensual.
+  </div>
+</p-card>

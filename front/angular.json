@@ -43,19 +43,11 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
-          "options": {
-            "buildTarget": "proy-plus:build",
-            "proxyConfig": "proxy.conf.json"
-          },
+          "options": { "buildTarget": "proy-plus:build" },
           "configurations": {
-            "production": {
-              "buildTarget": "proy-plus:build:production"
-            },
-            "development": {
-              "buildTarget": "proy-plus:build:development"
-            }
-          },
-          "defaultConfiguration": "development"
+            "local":  { "buildTarget": "proy-plus:build:development", "proxyConfig": "proxy.local.js" },
+            "docker": { "buildTarget": "proy-plus:build:development", "proxyConfig": "proxy.docker.js" }
+          }
         }
       }
     }

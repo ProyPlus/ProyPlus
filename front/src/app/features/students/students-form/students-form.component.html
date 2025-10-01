@@ -1,0 +1,122 @@
+<h2 class="form-title">Nuevo Estudiante</h2>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
+
+  <label>Username
+    <input formControlName="username" class="form-input"/>
+    <p class="form-error" *ngIf="getFieldError('username')">{{ getFieldError('username') }}</p>
+    <p class="form-error" *ngIf="usernameError()">{{ usernameError() }}</p>
+  </label>
+
+  <label>Password
+    <input type="password" formControlName="password" class="form-input"/>
+    <p class="form-error" *ngIf="getFieldError('password')">{{ getFieldError('password') }}</p>
+  </label>
+
+  <label>Email
+    <input formControlName="email" class="form-input"/>
+    <p class="form-error" *ngIf="getFieldError('email')">{{ getFieldError('email') }}</p>
+    <p class="form-error" *ngIf="emailError()">{{ emailError() }}</p>
+  </label>
+
+  <label>Nombre
+    <input formControlName="firstName" class="form-input"/>
+    <p class="form-error" *ngIf="getFieldError('firstName')">{{ getFieldError('firstName') }}</p>
+  </label>
+
+  <label>Apellido
+    <input formControlName="lastName" class="form-input"/>
+    <p class="form-error" *ngIf="getFieldError('lastName')">{{ getFieldError('lastName') }}</p>
+  </label>
+
+  <label>DNI
+    <input formControlName="dni" class="form-input"/>
+    <p class="form-error" *ngIf="getFieldError('dni')">{{ getFieldError('dni') }}</p>
+    <p class="form-error" *ngIf="dniError()">{{ dniError() }}</p>
+  </label>
+
+  <label>Teléfono
+    <input formControlName="phone" class="form-input"/>
+    <p class="form-error" *ngIf="getFieldError('phone')">{{ getFieldError('phone') }}</p>
+  </label>
+
+  <label>Fecha de Nacimiento
+    <input type="date" formControlName="dateOfBirth" class="form-input"/>
+    <p class="form-error" *ngIf="getFieldError('dateOfBirth')">{{ getFieldError('dateOfBirth') }}</p>
+  </label>
+
+  <label>Carrera
+    <input formControlName="career" class="form-input"/>
+    <p class="form-error" *ngIf="getFieldError('career')">{{ getFieldError('career') }}</p>
+  </label>
+
+  <label>Universidad
+    <select formControlName="university" class="form-input">
+      <option value="" disabled selected>Seleccione Universidad</option>
+      <option *ngFor="let u of universities" [value]="u">{{ u }}</option>
+    </select>
+    <p class="form-error" *ngIf="getFieldError('university')">{{ getFieldError('university') }}</p>
+  </label>
+
+  <label>Estado de Carrera
+    <select formControlName="degreeStatus" class="form-input">
+      <option value="" disabled selected>Seleccione Estado</option>
+      <option *ngFor="let d of degreeStatuses" [value]="d">{{ d }}</option>
+    </select>
+    <p class="form-error" *ngIf="getFieldError('degreeStatus')">{{ getFieldError('degreeStatus') }}</p>
+  </label>
+
+  <fieldset class="form-fieldset">
+    <legend>Dirección</legend>
+
+    <label>Calle
+      <input formControlName="street" class="form-input"/>
+      <p class="form-error" *ngIf="getFieldError('street')">{{ getFieldError('street') }}</p>
+    </label>
+
+    <label>Número
+      <input type="number" formControlName="number" class="form-input"/>
+      <p class="form-error" *ngIf="getFieldError('number')">{{ getFieldError('number') }}</p>
+    </label>
+
+    <label>Ciudad
+      <input formControlName="city" class="form-input"/>
+      <p class="form-error" *ngIf="getFieldError('city')">{{ getFieldError('city') }}</p>
+    </label>
+
+    <label>Provincia
+      <select formControlName="province" class="form-input">
+        <option value="" disabled selected>Seleccione Provincia</option>
+        <option *ngFor="let p of provinces" [value]="p">{{ p }}</option>
+      </select>
+      <p class="form-error" *ngIf="getFieldError('province')">{{ getFieldError('province') }}</p>
+    </label>
+
+    <label>Código Postal
+      <input type="number" formControlName="postalCode" class="form-input"/>
+      <p class="form-error" *ngIf="getFieldError('postalCode')">{{ getFieldError('postalCode') }}</p>
+    </label>
+  </fieldset>
+
+  <label>LinkedIn URL
+    <input formControlName="linkedinUrl" class="form-input"/>
+    <p class="form-error" *ngIf="getFieldError('linkedinUrl')">{{ getFieldError('linkedinUrl') }}</p>
+  </label>
+
+  <label>Descripción
+    <textarea formControlName="description" class="form-input"></textarea>
+    <p class="form-error" *ngIf="getFieldError('description')">{{ getFieldError('description') }}</p>
+  </label>
+
+  <button type="submit" class="btn-primary">Guardar</button>
+
+  <p *ngIf="successMessage()" class="form-success">{{ successMessage() }}</p>
+</form>
+
+<!-- Modal de éxito -->
+<div *ngIf="showModal()" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-xl p-6 w-80 text-center shadow-2xl">
+    <h2 class="text-xl font-bold mb-2">¡Registrado correctamente!</h2>
+    <p class="text-gray-600">Redirigiendo a Home…</p>
+  </div>
+</div>

@@ -1,0 +1,189 @@
+<p-toast></p-toast>
+
+<!-- Toolbar -->
+<p-toolbar class="mb-3">
+  <div class="p-toolbar-group-left">
+    <span class="p-input-icon-left">
+      <i class="pi pi-search"></i>
+      <input pInputText type="text" placeholder="Buscar proyectos..."
+             [(ngModel)]="q" (input)="applyFilters()" />
+    </span>
+
+    <!-- Select nativo para categoría -->
+    <span class="ml-2">
+      <select class="p-inputtext p-component" [(ngModel)]="selectedCategory" (change)="applyFilters()">
+        <option [ngValue]="''">Todas las categorías</option>
+        <option *ngFor="let c of categories" [ngValue]="c">{{ c }}</option>
+      </select>
+    </span>
+  </div>
+
+  <div class="p-toolbar-group-right flex items-center gap-2">
+    <button pButton icon="pi pi-th-large" label="Cards"
+            [outlined]="viewMode!=='cards'"
+            (click)="viewMode='cards'"></button>
+    <button pButton icon="pi pi-table" label="Tabla"
+            [outlined]="viewMode!=='table'"
+            (click)="viewMode='table'"></button>
+
+    <button pButton label="Refrescar" icon="pi pi-refresh" (click)="reload()" [disabled]="loading"></button>
+  </div>
+</p-toolbar>
+
+<!-- KPIs -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+  <p-card class="shadow-sm">
+    <div class="flex items-center gap-3">
+      <span class="pi pi-folder-open text-2xl opacity-80"></span>
+      <div><div class="text-xs opacity-70">Proyectos</div><div class="text-xl font-bold">{{ kpis.total }}</div></div>
+    </div>
+  </p-card>
+  <p-card class="shadow-sm">
+    <div class="flex items-center gap-3">
+      <span class="pi pi-bolt text-2xl opacity-80"></span>
+      <div><div class="text-xs opacity-70">Activos</div><div class="text-xl font-bold">{{ kpis.activos }}</div></div>
+    </div>
+  </p-card>
+  <p-card class="shadow-sm">
+    <div class="flex items-center gap-3">
+      <span class="pi pi-clock text-2xl opacity-80"></span>
+      <div><div class="text-xs opacity-70">Recientes (30d)</div><div class="text-xl font-bold">{{ kpis.recientes }}</div></div>
+    </div>
+  </p-card>
+  <p-card class="shadow-sm">
+    <div class="flex items-center gap-3">
+      <span class="pi pi-chart-line text-2xl opacity-80"></span>
+      <div><div class="text-xs opacity-70">Con financiación</div><div class="text-xl font-bold">{{ kpis.conFinanciacion }}</div></div>
+    </div>
+  </p-card>
+</div>
+
+<!-- Recomendados -->
+<p-card class="mt-4 shadow-sm" header="Recomendados">
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+    <div *ngFor="let p of recommended"
+         class="border rounded-xl p-3 h-full flex flex-col">
+      <div class="flex items-start justify-between gap-3">
+        <div class="font-semibold text-lg leading-tight">{{ p.title }}</div>
+        <button pButton [text]="true" [rounded]="true" [size]="'small'"
+                [icon]="isFav(p.id) ? 'pi pi-bookmark-fill' : 'pi pi-bookmark'"
+                [pTooltip]="isFav(p.id) ? 'Quitar de guardados' : 'Guardar'"
+                (click)="toggleFav(p)">
+        </button>
+      </div>
+      <div class="opacity-70 text-sm mt-1 line-clamp-3">{{ p.summary || '—' }}</div>
+      <div class="mt-2 flex gap-2 flex-wrap">
+        <p-tag [value]="p.category || '—'" [ngStyle]="tagStyle(p.category || '—', 0)"></p-tag>
+        <p-tag [value]="p.status || '—'"   [ngStyle]="tagStyle(p.status || '—', 1)"></p-tag>
+        <p-tag *ngIf="p.university" [value]="p.university" [ngStyle]="tagStyle(p.university, 2)"></p-tag>
+      </div>
+      <div class="mt-3 flex-1"></div>
+      <div class="mt-3 flex items-center justify-between">
+        <button pButton type="button" label="Ver" icon="pi pi-eye" (click)="openDetail(p)"></button>
+        <span class="text-xs opacity-70" *ngIf="p.lastUpdated">Actualizado: {{ p.lastUpdated | date:'dd/MM/yyyy' }}</span>
+      </div>
+    </div>
+  </div>
+</p-card>
+
+<!-- ===== Vista principal: CARDS o TABLA ===== -->
+<p-card class="mt-4 shadow-sm" header="Proyectos">
+  <!-- Cards -->
+  <div *ngIf="viewMode==='cards'" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+    <div *ngFor="let row of filtered"
+         class="border rounded-xl p-3 h-full flex flex-col">
+      <div class="flex items-start justify-between gap-3">
+        <div class="font-semibold text-lg leading-tight">{{ row.title }}</div>
+        <button pButton [text]="true" [rounded]="true" [size]="'small'"
+                [icon]="isFav(row.id) ? 'pi pi-bookmark-fill' : 'pi pi-bookmark'"
+                [pTooltip]="isFav(row.id) ? 'Quitar de guardados' : 'Guardar'"
+                (click)="toggleFav(row)"></button>
+      </div>
+      <div class="opacity-70 text-sm mt-1 line-clamp-3">{{ row.summary || '—' }}</div>
+      <div class="mt-2 flex gap-2 flex-wrap">
+        <p-tag [value]="row.category || '—'" [ngStyle]="tagStyle(row.category || '—', 0)"></p-tag>
+        <p-tag [value]="row.status || '—'"   [ngStyle]="tagStyle(row.status || '—', 1)"></p-tag>
+        <p-tag *ngIf="row.university" [value]="row.university" [ngStyle]="tagStyle(row.university, 2)"></p-tag>
+      </div>
+      <div class="mt-3 flex-1"></div>
+      <div class="mt-3 flex items-center justify-between">
+        <button pButton type="button" label="Ver" icon="pi pi-eye" (click)="openDetail(row)"></button>
+        <span class="text-xs opacity-70" *ngIf="row.lastUpdated">Actualizado: {{ row.lastUpdated | date:'dd/MM/yyyy' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla (opcional) -->
+  <p-table *ngIf="viewMode==='table'"
+    [value]="filtered" [loading]="loading" dataKey="id"
+    [rowHover]="true" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5,10,25,50]"
+    [globalFilterFields]="['title','summary','category','status','university']"
+    responsiveLayout="scroll">
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width:80px">ID</th>
+        <th>Título</th>
+        <th>Categoría</th>
+        <th>Estado</th>
+        <th>Universidad</th>
+        <th style="width:160px; text-align:center">Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-row>
+      <tr>
+        <td class="text-right">{{ row.id }}</td>
+        <td>{{ row.title }}</td>
+        <td><p-tag [value]="row.category || '—'" [ngStyle]="tagStyle(row.category || '—', 0)"></p-tag></td>
+        <td><p-tag [value]="row.status || '—'"   [ngStyle]="tagStyle(row.status || '—', 1)"></p-tag></td>
+        <td>{{ row.university || '—' }}</td>
+        <td class="text-center whitespace-nowrap">
+          <div class="flex items-center justify-center gap-1">
+            <button pButton type="button" pTooltip="Ver" icon="pi pi-eye" [text]="true" [rounded]="true" [size]="'small'"
+                    (click)="openDetail(row)"></button>
+            <button pButton type="button"
+                    [pTooltip]="isFav(row.id) ? 'Quitar de guardados' : 'Guardar'"
+                    [icon]="isFav(row.id) ? 'pi pi-bookmark-fill' : 'pi pi-bookmark'"
+                    [text]="true" [rounded]="true" [size]="'small'"
+                    (click)="toggleFav(row)"></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-card>
+
+<!-- Detalle -->
+<p-dialog [(visible)]="showDetail" [modal]="true"
+          [style]="{ width: '900px' }"
+          [breakpoints]="{ '1200px':'80vw', '960px':'90vw', '640px':'95vw' }"
+          [contentStyle]="{ 'max-height':'75vh', 'overflow':'auto' }"
+          [maximizable]="true" [dismissableMask]="true"
+          header="Detalle de proyecto">
+  <ng-container *ngIf="selected">
+    <div class="grid grid-cols-2 gap-3">
+      <div class="col-span-2 text-lg font-semibold">{{ selected.title }}</div>
+      <div><strong>Categoría:</strong> {{ selected.category || '—' }}</div>
+      <div><strong>Estado:</strong> {{ selected.status || '—' }}</div>
+      <div><strong>Universidad:</strong> {{ selected.university || '—' }}</div>
+      <div><strong>Líder:</strong> {{ selected.owner || '—' }}</div>
+      <div class="col-span-2">
+        <strong>Resumen:</strong>
+        <div class="opacity-80 mt-1">{{ selected.summary || '—' }}</div>
+      </div>
+      <div class="col-span-2" *ngIf="selected.fundingGoal != null || selected.fundingRaised != null">
+        <strong>Financiación:</strong>
+        <div class="opacity-80 mt-1">
+          Meta: {{ selected.fundingGoal ?? '—' }} · Recaudado: {{ selected.fundingRaised ?? '—' }}
+        </div>
+      </div>
+      <div class="col-span-2 flex gap-2 mt-2">
+        <p-tag *ngFor="let t of (selected.tags || []); let i = index" [value]="t" [ngStyle]="tagStyle(t, i)"></p-tag>
+      </div>
+    </div>
+    <p-divider></p-divider>
+    <details class="text-xs opacity-70">
+      <summary>Ver JSON</summary>
+      <pre class="whitespace-pre-wrap">{{ selected | json }}</pre>
+    </details>
+  </ng-container>
+</p-dialog>

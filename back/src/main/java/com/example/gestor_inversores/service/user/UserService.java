@@ -1,12 +1,16 @@
 package com.example.gestor_inversores.service.user;
 
-import com.example.gestor_inversores.dto.PatchUserDTO;
+import com.example.gestor_inversores.dto.RequestUserUpdateDTO;
+import com.example.gestor_inversores.exception.*;
 import com.example.gestor_inversores.mapper.UserMapper;
 import com.example.gestor_inversores.model.Role;
 import com.example.gestor_inversores.model.User;
 import com.example.gestor_inversores.repository.IUserRepository;
 import com.example.gestor_inversores.service.role.IRoleService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -40,18 +44,27 @@ public class UserService implements IUserService {
         return userRepository.findById(id);
     }
 
+    @Transactional
     @Override
     public User save(User user) {
-        // encriptar password
+
+        // Validar duplicados
+        userRepository.findUserEntityByUsername(user.getUsername())
+                .ifPresent(u -> { throw new UsernameAlreadyExistsException("El username ya existe."); });
+
+        userRepository.findByEmail(user.getEmail())
+                .ifPresent(u -> { throw new EmailAlreadyExistsException("El email ya existe."); });
+
+        // Encriptar password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        // setear valores por defecto
+        // Setear valores por defecto
         user.setEnabled(true);
         user.setAccountNotExpired(true);
         user.setAccountNotLocked(true);
         user.setCredentialNotExpired(true);
 
-        // validar roles existentes
+        // Validar roles existentes
         Set<Role> rolesValidados = new HashSet<>();
         if (user.getRolesList() != null && !user.getRolesList().isEmpty()) {
             for (Role r : user.getRolesList()) {
@@ -60,26 +73,46 @@ public class UserService implements IUserService {
         }
         user.setRolesList(rolesValidados);
 
-        return userRepository.save(user);
-    }
-
-    @Override
-    public void update(User userSec) {
-        userRepository.save(userSec);
-    }
-
-    @Override
-    public Optional<User> patchUser(Long id, PatchUserDTO patchDto) {
-        return userRepository.findById(id).map(user -> {
-            // Usamos el mapper para actualizar la entidad
-            userMapper.patchUserFromDto(patchDto, user);
+        try {
             return userRepository.save(user);
+        } catch (DataIntegrityViolationException | JpaSystemException ex) {
+            throw new CreateException("No se pudo guardar el usuario");
+        }
+    }
+
+    @Transactional
+    @Override
+    public void update(User user) {
+        try {
+            userRepository.save(user);
+        } catch (DataIntegrityViolationException | JpaSystemException ex) {
+            throw new UpdateException("No se pudo actualizar el usuario");
+        }
+    }
+
+    @Transactional
+    @Override
+    public Optional<User> patchUser(Long id, RequestUserUpdateDTO patchDto) {
+        return userRepository.findById(id).map(user -> {
+            userMapper.patchUserFromDto(patchDto, user);
+            try {
+                return userRepository.save(user); // JPA detecta que es update por tener id
+            } catch (DataIntegrityViolationException | JpaSystemException ex) {
+                throw new UpdateException("No se pudo actualizar el usuario");
+            }
         });
     }
 
+    @Transactional
     @Override
     public void deleteById(Long id) {
-        userRepository.deleteById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
+        try {
+            userRepository.deleteById(id);
+        } catch (DataIntegrityViolationException | JpaSystemException ex) {
+            throw new DeleteException("No se pudo eliminar el usuario");
+        }
     }
 
     @Override
@@ -87,19 +120,31 @@ public class UserService implements IUserService {
         return userRepository.findByEmail(email);
     }
 
+    @Transactional
     @Override
     public User activateUser(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
         user.setEnabled(true);
-        return userRepository.save(user);
+
+        try {
+            return userRepository.save(user);
+        } catch (DataIntegrityViolationException | JpaSystemException ex) {
+            throw new UpdateException("No se pudo activar el usuario");
+        }
     }
 
+    @Transactional
     @Override
     public User desactivateUser(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
         user.setEnabled(false);
-        return userRepository.save(user);
+
+        try {
+            return userRepository.save(user);
+        } catch (DataIntegrityViolationException | JpaSystemException ex) {
+            throw new UpdateException("No se pudo desactivar el usuario");
+        }
     }
 }

@@ -19,7 +19,9 @@
     "rxjs": "^7.8.1",
     "tslib": "^2.6.3",
     "zod": "^4.1.5",
-    "zone.js": "^0.15.1"
+    "zone.js": "^0.15.1",
+    "chart.js": "^4.x.x"
+
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "20.2.2",
@@ -33,7 +35,8 @@
   },
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --proxy-config proxy.conf.json",
+    "start:local":  "ng serve --configuration local",
+    "start:docker": "ng serve --host 0.0.0.0 --port 4200 --poll 2000 --configuration docker",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"

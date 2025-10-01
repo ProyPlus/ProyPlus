@@ -1,7 +1,7 @@
 package com.example.gestor_inversores.mapper;
 
-import com.example.gestor_inversores.dto.CreateUserDTO;
-import com.example.gestor_inversores.dto.PatchUserDTO;
+import com.example.gestor_inversores.dto.RequestUserDTO;
+import com.example.gestor_inversores.dto.RequestUserUpdateDTO;
 import com.example.gestor_inversores.dto.ResponseUserDTO;
 import com.example.gestor_inversores.dto.RoleDTO;
 import com.example.gestor_inversores.model.Role;
@@ -20,7 +20,7 @@ public class UserMapper {
     @Autowired
     private IRoleService roleService;
 
-    public User requestUserDTOToUser(CreateUserDTO dto) {
+    public User requestUserDTOToUser(RequestUserDTO dto) {
         if (dto == null) return null;
 
         User user = new User();
@@ -71,7 +71,7 @@ public class UserMapper {
     }
 
     // Método para actualizar un User con PatchUserDTO
-    public void patchUserFromDto(PatchUserDTO dto, User user) {
+    public void patchUserFromDto(RequestUserUpdateDTO dto, User user) {
 
         // Campos básicos
         if (dto.getUsername() != null) user.setUsername(dto.getUsername());

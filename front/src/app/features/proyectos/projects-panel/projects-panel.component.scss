@@ -1,0 +1,10 @@
+:host { display: block; padding: 1rem; }
+.p-card { border-radius: 1rem; }
+.line-clamp-3 { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+
+/* Animación simple para el directive */
+.aos-init { opacity: 0; transform: translateY(8px); transition: opacity .5s ease, transform .5s ease; }
+.aos-enter { opacity: 1; transform: translateY(0); }
+.aos-leave { opacity: 0; transform: translateY(8px); }
+
+.card-appear { will-change: transform, opacity; }

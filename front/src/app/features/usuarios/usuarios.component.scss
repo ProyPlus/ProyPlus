@@ -1,57 +1,19 @@
-:host {
-  /* tokens base (se adaptan si activás .app-dark) */
-  --tbl-bg: var(--surface-card, #fff);
-  --tbl-text: var(--text-color, #111827);
-  --tbl-head-bg: color-mix(in oklab, var(--surface-card, #fff), #000 3%);
-  --tbl-border: var(--surface-border, #e5e7eb);
-}
+/* usuarios.component.scss (mínimo o incluso vacío) */
+:host { display: block; padding: 1rem; }
 
-/* -------- Tablas nativas -------- */
-:host .content table,
-:host table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--tbl-bg);
-  color: var(--tbl-text);
-}
+/* opcionales locales de este componente */
+.id-col { text-align: right; width: 80px; }
+/* Colores propios para tags de rol (usa variables del theme Lara) */
+:host ::ng-deep .p-tag.tag-green  { background: var(--green-500);  color: var(--surface-0); border-color: transparent; }
+:host ::ng-deep .p-tag.tag-blue   { background: var(--blue-500);   color: var(--surface-0); border-color: transparent; }
+:host ::ng-deep .p-tag.tag-orange { background: var(--orange-500); color: var(--surface-0); border-color: transparent; }
+:host ::ng-deep .p-tag.tag-red    { background: var(--red-500);    color: var(--surface-0); border-color: transparent; }
+:host ::ng-deep .p-tag.tag-purple { background: var(--purple-500); color: var(--surface-0); border-color: transparent; }
+:host ::ng-deep .p-tag.tag-teal   { background: var(--teal-500);   color: var(--surface-0); border-color: transparent; }
+:host ::ng-deep .p-tag.tag-cyan   { background: var(--cyan-500);   color: var(--surface-0); border-color: transparent; }
 
-:host thead th {
-  background: var(--tbl-head-bg);
-  color: var(--tbl-text);
-  border-bottom: 1px solid var(--tbl-border);
-  font-weight: 600;
-}
-
-:host tbody tr {
-  background: var(--tbl-bg);
-  border-bottom: 1px solid var(--tbl-border);
-}
-
-:host tbody tr:nth-child(even) {
-  background: color-mix(in oklab, var(--tbl-bg), #000 3%);
-}
-
-/* Si por accidente tenías .table-dark en el html, lo neutralizamos */
-:host .table-dark {
-  background: var(--tbl-bg) !important;
-  color: var(--tbl-text) !important;
-}
-
-/* -------- PrimeNG DataTable (si usás p-table) -------- */
-:host ::ng-deep .p-datatable {
-  background: transparent;
-  color: var(--tbl-text);
-}
-:host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
-  background: var(--tbl-head-bg);
-  color: var(--tbl-text);
-  border-color: var(--tbl-border);
-}
-:host ::ng-deep .p-datatable .p-datatable-tbody > tr {
-  background: var(--tbl-bg);
-  color: var(--tbl-text);
-  border-color: var(--tbl-border);
-}
-:host ::ng-deep .p-datatable .p-datatable-tbody > tr:nth-child(even) {
-  background: color-mix(in oklab, var(--tbl-bg), #000 3%);
+/* (opcional) forma redondeada y fuente bold como en tu captura */
+:host ::ng-deep .p-tag {
+  font-weight: 700;
+  border-radius: 8px;
 }
