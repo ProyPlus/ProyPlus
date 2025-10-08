@@ -112,3 +112,13 @@ textarea {
 .progress-bar-fill {
   height: 100%; background-color: #4CAF50; width: 0; transition: width 0.3s ease;
 }
+
+
+.logo-proyplus {
+  max-width: 250px;  /* Ajusta este valor. Prueba con 200px, 180px, etc., hasta que te guste. */
+  height: auto;      /* IMPORTANTE: Mantiene la proporción de la imagen. */
+  display: block;    /* Hace que la imagen ocupe su propia línea, lo cual ayuda con el margen y la alineación. */
+  margin-bottom: 20px; /* Añade un poco de espacio entre el logo y el título h1 */
+  margin-left: 0;    /* Asegura que no haya margen izquierdo empujándolo. */
+  margin-right: auto; /* Ayuda a que se quede a la izquierda si el contenedor es más grande */
+}

@@ -58,7 +58,8 @@ toggleDarkMode() {
   { label: 'Mis Proyectos', icon:'pi pi-pencil',routerLink:'/misproyectos' },
   { label: 'Mis Marquesinas', icon:'pi pi-pencil',routerLink:'/mismarquesinas' },
   { label: 'Marquesinas', icon:'pi pi-pencil',routerLink:'/marquesinas' },
-  { label: 'Noticias', icon:'pi pi-bell', routerLink:'/noticias' }
+  { label: 'Noticias', icon:'pi pi-bell', routerLink:'/noticias' },
+  { label: 'Mis Inversiones', icon:'pi pi-bell', routerLink:'/misinversiones' }
       ]
     },
     {///

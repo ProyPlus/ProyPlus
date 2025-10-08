@@ -18,19 +18,16 @@ $gray-light: #6c757d;
 }
 
 .header-section {
- // display: flex;
- // justify-content: space-between;
- // align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 2rem;
-  //flex-wrap: wrap;
+  flex-wrap: wrap;
 
   h1 {
     font-size: 2rem;
     font-weight: bold;
     margin: 0;
-    text-align: center; /* Centra el texto "Mis Proyectos" */
-    width: 100%;        /* Asegura que el h1 ocupe todo el ancho disponible para que el centrado funcione */
-    margin-top: 0;
   }
 
   .controls {
@@ -221,13 +218,4 @@ $gray-light: #6c757d;
   .search-container, .new-project-button {
     width: 100%;
   }
-}
-
-.logo-proyplus {
-  max-width: 250px;  /* Ajusta este valor. Prueba con 200px, 180px, etc., hasta que te guste. */
-  height: auto;      /* IMPORTANTE: Mantiene la proporción de la imagen. */
-  display: block;    /* Hace que la imagen ocupe su propia línea, lo cual ayuda con el margen y la alineación. */
-  margin-bottom: 20px; /* Añade un poco de espacio entre el logo y el título h1 */
-  margin-left: 0;    /* Asegura que no haya margen izquierdo empujándolo. */
-  margin-right: auto; /* Ayuda a que se quede a la izquierda si el contenedor es más grande */
 }

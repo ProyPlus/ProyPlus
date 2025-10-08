@@ -26,6 +26,7 @@ import { AuthService } from "./auth.service";
       <div class="bg-white/20 backdrop-blur-lg rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 hover:shadow-3xl">
         <div class="p-8">
           <div class="text-center mb-8">
+            <img src="assets/images/proypluslogo.png" alt="Proy+ Proyectos" class="logo-proyplus">
             <h1 class="text-3xl font-bold text-white mb-2">Proy +</h1>
             <p class="text-white/80">Autenticación</p>
           </div>
@@ -142,13 +143,15 @@ import { AuthService } from "./auth.service";
   </div>
   `,
   // ====== ESTILOS LOCALES ======
+  ////David style background: linear-gradient(-45deg,#ee7752,#e73c7e,#23a6d5,#23d5ab);
   styles: [`
     @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
     @keyframes gradientBG { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
 
     .bg-animated-gradient {
-      background: linear-gradient(-45deg,#ee7752,#e73c7e,#23a6d5,#23d5ab);
+      background: linear-gradient(-45deg,#000000,#333333,#144075,#23a6d5,#23d5ab);
+      
       background-size: 400% 400%;
       animation: gradientBG 15s ease infinite;
     }
@@ -158,6 +161,15 @@ import { AuthService } from "./auth.service";
     .image-upload-container:hover { transform: scale(1.05); }
     .image-preview { transition: all .3s ease; filter: drop-shadow(0 10px 15px rgba(0,0,0,.3)); }
     .image-preview:hover { filter: drop-shadow(0 20px 25px rgba(0,0,0,.4)); }
+
+    .logo-proyplus {
+    max-width: 100px; /* Ajusta el tamaño para que se vea bien */
+    height: auto;
+    display: block; /* Mantiene el centrado horizontal del .text-center */
+    margin: 0 auto 10px auto; /* Centrado horizontal y margen inferior */
+    }
+
+
   `],
 })
 export class LoginComponent {
