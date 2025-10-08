@@ -6,9 +6,12 @@ import com.example.gestor_inversores.mapper.*;
 import com.example.gestor_inversores.model.*;
 import com.example.gestor_inversores.model.enums.Currency;
 import com.example.gestor_inversores.model.enums.InvestmentStatus;
+import com.example.gestor_inversores.model.enums.ContractStatus;
 import com.example.gestor_inversores.repository.*;
 import com.example.gestor_inversores.service.currency.CurrencyConversionService;
+import com.example.gestor_inversores.service.contract.ContractService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -38,6 +41,10 @@ public class InvestmentService implements IInvestmentService {
 
     @Autowired
     private CurrencyConversionService currencyConversionService;
+
+    @Autowired
+    @Lazy // Para evitar circular dependency con ContractService
+    private ContractService contractService;
 
     @Override
     public ResponseInvestmentDTO create(RequestInvestmentDTO dto) {
@@ -79,6 +86,10 @@ public class InvestmentService implements IInvestmentService {
         Student student = studentRepo.findById(studentId)
                 .orElseThrow(() -> new StudentNotFoundException("Estudiante no encontrado"));
 
+        if (inv.getStatus() == InvestmentStatus.RECEIVED || inv.getStatus() == InvestmentStatus.NOT_RECEIVED) {
+            throw new UpdateException("Esta inversión ya fue confirmada y no se puede modificar nuevamente.");
+        }
+
         if (status != InvestmentStatus.RECEIVED && status != InvestmentStatus.NOT_RECEIVED) {
             throw new UpdateException("Estado inválido para confirmación");
         }
@@ -88,12 +99,11 @@ public class InvestmentService implements IInvestmentService {
         inv.setConfirmedAt(LocalDate.now());
         Investment updatedInvestment = investmentRepo.save(inv);
 
-        // Sumar al currentGoal solo si es RECEIVED
+        // ⚡ Ajuste del currentGoal si es RECEIVED
         if (status == InvestmentStatus.RECEIVED) {
             Project project = updatedInvestment.getProject();
 
             BigDecimal amountInUSD = updatedInvestment.getAmount();
-            // Convertir si la inversión NO es en USD
             if (updatedInvestment.getCurrency() != Currency.USD) {
                 amountInUSD = currencyConversionService
                         .getConversionRate(updatedInvestment.getCurrency().name(), "USD")
@@ -110,6 +120,11 @@ public class InvestmentService implements IInvestmentService {
             projectRepo.save(project);
         }
 
+        // ⚡ Auto-cancelar contrato si estudiante marca NOT_RECEIVED
+        if (status == InvestmentStatus.NOT_RECEIVED) {
+            autoCancelContractIfNeeded(updatedInvestment);
+        }
+
         return mapper.toResponse(updatedInvestment);
     }
 
@@ -118,15 +133,18 @@ public class InvestmentService implements IInvestmentService {
         Investment inv = investmentRepo.findByIdInvestmentAndDeletedFalse(id)
                 .orElseThrow(() -> new InvestmentNotFoundException("Inversión no encontrada"));
 
-        // Solo se puede cancelar si está en IN_PROGRESS
         if (inv.getStatus() != InvestmentStatus.IN_PROGRESS) {
             throw new UpdateException("La inversión no puede ser cancelada en el estado actual: " + inv.getStatus());
         }
 
         inv.setStatus(InvestmentStatus.CANCELLED);
-        inv.setConfirmedAt(LocalDate.now()); // fecha de cancelación, reutilizamos este campo
+        inv.setConfirmedAt(LocalDate.now());
 
         Investment updatedInvestment = investmentRepo.save(inv);
+
+        // ⚡ Auto-cancelar contrato si inversión cancelada
+        autoCancelContractIfNeeded(updatedInvestment);
+
         return mapper.toResponse(updatedInvestment);
     }
 
@@ -145,7 +163,6 @@ public class InvestmentService implements IInvestmentService {
                 .collect(Collectors.toList());
     }
 
-    // Para estudiantes
     @Override
     public List<ResponseInvestmentDTO> getActiveForStudents() {
         List<InvestmentStatus> allowedStatuses = List.of(
@@ -159,7 +176,6 @@ public class InvestmentService implements IInvestmentService {
                 .collect(Collectors.toList());
     }
 
-    // Para estudiantes: solo inversiones activas de un proyecto
     @Override
     public List<ResponseInvestmentDTO> getActiveByProjectForStudents(Long projectId) {
         List<InvestmentStatus> allowedStatuses = List.of(
@@ -182,5 +198,62 @@ public class InvestmentService implements IInvestmentService {
         inv.setDeletedAt(LocalDate.now());
 
         return mapper.toResponse(investmentRepo.save(inv));
+    }
+
+    @Override
+    public ResponseInvestmentDTO returnInvestment(Long investmentId) {
+        Investment inv = investmentRepo.findByIdInvestmentAndDeletedFalse(investmentId)
+                .orElseThrow(() -> new InvestmentNotFoundException("Inversión no encontrada"));
+
+        if (inv.getStatus() != InvestmentStatus.RECEIVED) {
+            throw new UpdateException("Solo inversiones RECEIVED pueden ser devueltas al inversor");
+        }
+
+        inv.setStatus(InvestmentStatus.RETURNED);
+        inv.setConfirmedAt(LocalDate.now());
+
+        Project project = inv.getProject();
+        BigDecimal amountInUSD = inv.getAmount();
+        if (inv.getCurrency() != Currency.USD) {
+            amountInUSD = currencyConversionService
+                    .getConversionRate(inv.getCurrency().name(), "USD")
+                    .getRate()
+                    .multiply(inv.getAmount());
+        }
+
+        BigDecimal newCurrentGoal = project.getCurrentGoal().subtract(amountInUSD);
+        if (newCurrentGoal.compareTo(BigDecimal.ZERO) < 0) {
+            newCurrentGoal = BigDecimal.ZERO;
+        }
+
+        project.setCurrentGoal(newCurrentGoal);
+        projectRepo.save(project);
+
+        return mapper.toResponse(investmentRepo.save(inv));
+    }
+
+    // -------------------
+    // 🔹 Método interno para auto-cancelar contrato
+    // -------------------
+    private void autoCancelContractIfNeeded(Investment inv) {
+        if (inv.getContract() != null &&
+                (inv.getStatus() == InvestmentStatus.NOT_RECEIVED || inv.getStatus() == InvestmentStatus.CANCELLED)) {
+
+            Contract contract = inv.getContract();
+
+            if (contract.getStatus() == ContractStatus.SIGNED) {
+                contract.setStatus(ContractStatus.CANCELLED);
+
+                ContractAction action = ContractAction.builder()
+                        .contract(contract)
+                        .student(inv.getConfirmedBy()) // puede ser null si no hubo estudiante
+                        .status(ContractStatus.CANCELLED)
+                        .actionDate(LocalDate.now())
+                        .build();
+
+                contract.getActions().add(action);
+                contractService.saveContract(contract);
+            }
+        }
     }
 }

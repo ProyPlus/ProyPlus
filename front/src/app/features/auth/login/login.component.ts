@@ -1,10 +1,11 @@
-// src/app/features/auth/login/login.component.ts
-import { Component, ElementRef, ViewChild, inject, signal } from "@angular/core";
+import { Component, ElementRef, ViewChild, inject, signal, OnDestroy } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
-import { Router,RouterLink } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
+import { Subscription } from "rxjs";
 import { AuthService } from "./auth.service";
-
+import type { AuthError } from "../shared/auth-errors";
+import { AuthErrorModalComponent } from "../shared/auth-error-modal.component";
 
 @Component({
   standalone: true,
@@ -148,7 +149,6 @@ import { AuthService } from "./auth.service";
     @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
     @keyframes gradientBG { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-
     .bg-animated-gradient {
       background: linear-gradient(-45deg,#000000,#333333,#144075,#23a6d5,#23d5ab);
       
@@ -172,7 +172,7 @@ import { AuthService } from "./auth.service";
 
   `],
 })
-export class LoginComponent {
+export class LoginComponent implements OnDestroy {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private auth = inject(AuthService);
@@ -185,33 +185,45 @@ export class LoginComponent {
   });
 
   loading = signal(false);
-  error = signal(false);
+  serverError = signal<AuthError | null>(null);
   masked = signal(true);
 
-  // imagen (opcional, por si después la querés mandar al backend)
+  // imagen (opcional)
   previewDataUrl = signal<string | null>(null);
   dragOver = signal(false);
 
-  openFilePicker() { this.fileInput?.nativeElement.click(); }
+  private subs = new Subscription();
 
+  constructor() {
+    // limpio el modal al editar el formulario
+    this.subs.add(
+      this.form.valueChanges.subscribe(() => {
+        if (this.serverError()) this.serverError.set(null);
+      })
+    );
+  }
+
+  ngOnDestroy(): void { this.subs.unsubscribe(); }
+
+  // ========= helpers de mensaje para el modal =========
+  messageFor(err: AuthError): string {
+    if (!err) return "";
+    const base = err.title?.endsWith(".") ? err.title.slice(0, -1) : err.title;
+    const det = err.detail ?? "";
+    return det && det !== err.title ? `${base}. — ${det}` : base;
+  }
+
+  // ========= Imagen =========
+  openFilePicker() { this.fileInput?.nativeElement.click(); }
   onFileSelected(e: Event) {
     const input = e.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
-
     const reader = new FileReader();
-    reader.onload = (ev) => {
-      this.previewDataUrl.set(String(ev.target?.result ?? ""));
-      // animación simple
-      // (el CSS ya tiene transitions en .image-preview)
-    };
+    reader.onload = (ev) => this.previewDataUrl.set(String(ev.target?.result ?? ""));
     reader.readAsDataURL(file);
   }
-
-  onDragOver(e: DragEvent) {
-    e.preventDefault();
-    this.dragOver.set(true);
-  }
+  onDragOver(e: DragEvent) { e.preventDefault(); this.dragOver.set(true); }
   onDragLeave() { this.dragOver.set(false); }
   onDrop(e: DragEvent) {
     e.preventDefault();
@@ -227,24 +239,26 @@ export class LoginComponent {
     if (this.fileInput?.nativeElement) this.fileInput.nativeElement.value = "";
   }
 
+  // ========= Validaciones UI =========
   showError(ctrl: "username" | "password") {
     const c = this.form.get(ctrl)!;
     return (c.touched || c.dirty) && c.invalid;
   }
   toggleMask() { this.masked.update(v => !v); }
 
+  // ========= Submit =========
   onSubmit() {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.loading.set(true);
-    this.error.set(false);
+    this.serverError.set(null);
 
     const { username, password } = this.form.getRawValue();
 
     this.auth.login(username!, password!).subscribe({
       next: () => this.router.navigateByUrl("/dashboard", { replaceUrl: true }),
       error: (err) => {
-        console.error("Login error:", err);
-        this.error.set(true);
+        // err ya viene normalizado por mapAuthError en el service
+        this.serverError.set(err);
         this.loading.set(false);
       },
       complete: () => this.loading.set(false),

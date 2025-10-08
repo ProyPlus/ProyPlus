@@ -59,4 +59,11 @@ public class Investment {
     private boolean deleted = false;
     private LocalDate deletedAt;
 
+    // Investment.java
+    @OneToOne(mappedBy = "investment")
+    private Contract contract; // opcional, solo para navegación
+
+
+
+
 }

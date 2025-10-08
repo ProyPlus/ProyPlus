@@ -1,7 +1,8 @@
 // src/app/features/auth/login/auth.service.ts
 import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { tap, map, Observable } from "rxjs";
+import { tap, map, Observable, catchError, throwError } from "rxjs"; // 👈 agrego catchError/throwError
+import { mapAuthError } from "../shared/auth-errors";           
 
 interface LoginResponse {
   username: string;
@@ -38,7 +39,8 @@ export class AuthService {
         if (!res?.status || !res?.jwt) throw new Error("Login inválido");
         return this.toSession(res);
       }),
-      tap((s) => this.persist(s))
+      tap((s) => this.persist(s)),
+      catchError((err) => throwError(() => mapAuthError(err))) // 👈 normalizo y re-lanzo tipado
     );
   }
 

@@ -26,5 +26,6 @@ public interface IInvestmentService {
 
     ResponseInvestmentDTO delete(Long id);
 
+    ResponseInvestmentDTO returnInvestment(Long investmentId);
 
 }

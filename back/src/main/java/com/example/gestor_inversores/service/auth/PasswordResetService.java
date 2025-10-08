@@ -92,7 +92,7 @@ public class PasswordResetService implements IPasswordResetService {
         email.setTo(user.getEmail());
         email.setSubject("Restablecer Contraseña");
         email.setText("Para restablecer tu contraseña, haz clic en el siguiente enlace: \n"
-                + "http://localhost:8080/reset-password?token=" + token); // reemplazar por URL de frontend
+                + "http://72.60.11.35:4200/auth/reset-password?token=" + token); // reemplazar por URL de frontend
         mailSender.send(email);
     }
 }
