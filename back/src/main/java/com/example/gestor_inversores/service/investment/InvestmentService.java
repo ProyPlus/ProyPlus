@@ -289,8 +289,8 @@ public class InvestmentService implements IInvestmentService {
             throw new UnauthorizedOperationException("No tienes permiso para gestionar esta inversión. Solo el dueño del proyecto puede hacerlo.");
         }
 
-        if (inv.getStatus() != InvestmentStatus.IN_PROGRESS) {
-            throw new UpdateException("Esta inversión ya fue procesada y no se puede modificar nuevamente.");
+        if (inv.getStatus() != InvestmentStatus.PENDING_CONFIRMATION) {
+            throw new UpdateException("Solo se puede marcar como no recibida una inversión que está pendiente de confirmación.");
         }
 
         inv.setStatus(InvestmentStatus.NOT_RECEIVED);
