@@ -27,7 +27,7 @@ export interface IMyProject {
 
 export interface IInvestment {
   idInvestment: number;
-  status: 'PENDING_PAYMENT' | 'PENDING_CONFIRMATION' | 'RECEIVED' | 'COMPLETED' | 'NOT_RECEIVED' | 'CANCELLED';
+  status: 'IN_PROGRESS' | 'PENDING_CONFIRMATION' | 'RECEIVED' | 'COMPLETED' | 'NOT_RECEIVED' | 'CANCELLED' | 'PENDING_RETURN' | 'RETURNED';
   // ... otras propiedades que pueda tener una inversión
 }
 

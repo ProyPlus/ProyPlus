@@ -792,6 +792,27 @@ export class ProyectosMaestroComponent implements OnInit {
     }
   }
 
+  getInvestmentStatusLabel(status: IInvestment['status'] | null): string {
+    switch (status) {
+      case 'IN_PROGRESS': return 'Pendiente de Pago'; // Mapear IN_PROGRESS a "Pendiente de Pago"
+      case 'PENDING_CONFIRMATION': return 'Pendiente de Confirmación';
+      case 'RECEIVED': return 'Recibido';
+      case 'COMPLETED': return 'Completado';
+      case 'NOT_RECEIVED': return 'No Recibido';
+      case 'CANCELLED': return 'Cancelado';
+      default: return 'Desconocido';
+    }
+  }
+
+  getEarningStatusLabel(status: IEarning['status'] | null): string {
+    switch (status) {
+      case 'PENDING': return 'Pendiente de Pago';
+      case 'PAID': return 'Pago Enviado';
+      case 'CONFIRMED': return 'Recibido y Confirmado';
+      default: return 'Desconocido';
+    }
+  }
+
   tagStyle(text: string, i = 0) {
     const palette = ['#e0f2fe', '#dcfce7', '#fee2e2', '#fef9c3', '#ede9fe'];
     const idx = Math.abs((text || '').length + i) % palette.length;

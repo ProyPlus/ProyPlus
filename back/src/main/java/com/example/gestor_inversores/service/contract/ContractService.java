@@ -373,7 +373,7 @@ public class ContractService implements IContractService {
         inv.setCurrency(contract.getCurrency());
         inv.setGeneratedBy(contract.getCreatedByInvestor());
         inv.setProject(contract.getProject());
-        inv.setStatus(InvestmentStatus.IN_PROGRESS);
+        inv.setStatus(InvestmentStatus.IN_PROGRESS); // Revertido: El estado inicial es IN_PROGRESS según el enum
         inv.setCreatedAt(LocalDate.now());
         inv.setContract(contract);
         investmentRepo.save(inv);
