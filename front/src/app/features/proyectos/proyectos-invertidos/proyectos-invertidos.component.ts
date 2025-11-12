@@ -162,4 +162,21 @@ ngOnInit(): void {
       return !isNaN(d.getTime()) && (now.getTime() - d.getTime()) <= days30;
     }).length;
   }
+
+  getProjectStatusLabel(status: string | null | undefined): string {
+    switch (status) {
+      case 'IN_PROGRESS': return 'En Progreso';
+      case 'PENDING_FUNDING': return 'Pendiente de Financiación';
+      case 'COMPLETED': return 'Completado';
+      case 'CANCELLED': return 'Cancelado';
+      case 'IDEA': return 'Idea';
+      case 'MVP': return 'MVP';
+      case 'FUNDING': return 'En Financiación';
+      default: return status || 'No definido';
+    }
+  }
+
+  getCategoryLabel(category: string | null | undefined): string {
+    return !category || category === '—' ? 'Sin categoría' : category;
+  }
 }

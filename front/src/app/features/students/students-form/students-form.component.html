@@ -1,3 +1,5 @@
+<p-toast></p-toast>
+
 <div class="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center p-4">
   <div class="max-w-4xl w-full">
     <div class="bg-white dark:bg-gray-800 shadow-lg rounded-xl p-6 md:p-8">
@@ -20,8 +22,7 @@
               <i class="pi pi-info-circle cursor-pointer" pTooltip="Elige un nombre de usuario único para identificarte en la plataforma."></i>
             </label>
             <input id="username" type="text" pInputText formControlName="username" class="w-full mt-1" autocomplete="off" />
-            <small *ngIf="getFieldError('username')" class="p-error">{{ getFieldError('username') }}</small>
-            <small *ngIf="usernameError()" class="p-error">{{ usernameError() }}</small>
+            <small *ngIf="isInvalidField('username') || form.get('username')?.pending" class="p-error">{{ form.get('username')?.pending ? 'Comprobando disponibilidad...' : getFieldError('username') }}</small>
           </div>
 
           <div class="field">
@@ -30,7 +31,7 @@
               <i class="pi pi-info-circle cursor-pointer" pTooltip="Debe tener al menos 6 caracteres. Combina letras y números para mayor seguridad."></i>
             </label>
             <input id="password" type="password" pInputText formControlName="password" class="w-full mt-1" autocomplete="new-password" />
-            <small *ngIf="getFieldError('password')" class="p-error">{{ getFieldError('password') }}</small>
+            <small *ngIf="isInvalidField('password')" class="p-error">{{ getFieldError('password') }}</small>
           </div>
 
           <div class="field">
@@ -39,8 +40,7 @@
               <i class="pi pi-info-circle cursor-pointer" pTooltip="Usa tu email institucional si es posible. Aquí recibirás notificaciones importantes."></i>
             </label>
             <input id="email" type="email" pInputText formControlName="email" class="w-full mt-1" />
-            <small *ngIf="getFieldError('email')" class="p-error">{{ getFieldError('email') }}</small>
-            <small *ngIf="emailError()" class="p-error">{{ emailError() }}</small>
+            <small *ngIf="isInvalidField('email') || form.get('email')?.pending" class="p-error">{{ form.get('email')?.pending ? 'Comprobando disponibilidad...' : getFieldError('email') }}</small>
           </div>
 
           <!-- Sección de Datos Personales -->
@@ -54,7 +54,7 @@
               <i class="pi pi-info-circle cursor-pointer" pTooltip="Tu nombre de pila."></i>
             </label>
             <input id="firstName" type="text" pInputText formControlName="firstName" class="w-full mt-1" />
-            <small *ngIf="getFieldError('firstName')" class="p-error">{{ getFieldError('firstName') }}</small>
+            <small *ngIf="isInvalidField('firstName')" class="p-error">{{ getFieldError('firstName') }}</small>
           </div>
 
           <div class="field">
@@ -63,7 +63,7 @@
               <i class="pi pi-info-circle cursor-pointer" pTooltip="Tu apellido."></i>
             </label>
             <input id="lastName" type="text" pInputText formControlName="lastName" class="w-full mt-1" />
-            <small *ngIf="getFieldError('lastName')" class="p-error">{{ getFieldError('lastName') }}</small>
+            <small *ngIf="isInvalidField('lastName')" class="p-error">{{ getFieldError('lastName') }}</small>
           </div>
 
           <div class="field">
@@ -71,9 +71,8 @@
               <span>DNI <span class="text-red-500">*</span></span>
               <i class="pi pi-info-circle cursor-pointer" pTooltip="Tu Documento Nacional de Identidad (8 dígitos, sin puntos)."></i>
             </label>
-            <input id="dni" type="text" pInputText formControlName="dni" class="w-full mt-1" pKeyFilter="int" maxlength="8" />
-            <small *ngIf="getFieldError('dni')" class="p-error">{{ getFieldError('dni') }}</small>
-            <small *ngIf="dniError()" class="p-error">{{ dniError() }}</small>
+            <input id="dni" type="text" pInputText formControlName="dni" class="w-full mt-1" pKeyFilter="int" maxlength="20" />
+            <small *ngIf="isInvalidField('dni') || form.get('dni')?.pending" class="p-error">{{ form.get('dni')?.pending ? 'Comprobando DNI...' : getFieldError('dni') }}</small>
           </div>
 
           <div class="field">
@@ -82,7 +81,7 @@
               <i class="pi pi-info-circle cursor-pointer" pTooltip="Un número de teléfono de contacto directo."></i>
             </label>
             <input id="phone" type="text" pInputText formControlName="phone" class="w-full mt-1" />
-            <small *ngIf="getFieldError('phone')" class="p-error">{{ getFieldError('phone') }}</small>
+            <small *ngIf="isInvalidField('phone')" class="p-error">{{ getFieldError('phone') }}</small>
           </div>
 
           <div class="field">
@@ -91,7 +90,7 @@
               <i class="pi pi-info-circle cursor-pointer" pTooltip="Tu fecha de nacimiento."></i>
             </label>
             <input id="dateOfBirth" type="date" pInputText formControlName="dateOfBirth" class="w-full mt-1" />
-            <small *ngIf="getFieldError('dateOfBirth')" class="p-error">{{ getFieldError('dateOfBirth') }}</small>
+            <small *ngIf="isInvalidField('dateOfBirth')" class="p-error">{{ getFieldError('dateOfBirth') }}</small>
           </div>
 
           <div class="field">
@@ -100,7 +99,17 @@
               <i class="pi pi-info-circle cursor-pointer" pTooltip="Tu perfil de LinkedIn (opcional). Ayuda a los inversores a conocerte mejor."></i>
             </label>
             <input id="linkedinUrl" type="text" pInputText formControlName="linkedinUrl" class="w-full mt-1" placeholder="https://www.linkedin.com/in/tu-perfil" />
-            <small *ngIf="getFieldError('linkedinUrl')" class="p-error">{{ getFieldError('linkedinUrl') }}</small>
+            <small *ngIf="isInvalidField('linkedinUrl')" class="p-error">{{ getFieldError('linkedinUrl') }}</small>
+          </div>
+
+          <div class="field md:col-span-2">
+            <label for="description" class="font-medium flex items-center gap-2">
+              <span>Descripción</span>
+              <i class="pi pi-info-circle cursor-pointer" pTooltip="Una breve descripción sobre ti, tus habilidades e intereses (opcional)."></i>
+            </label>
+            <textarea id="description" pInputText formControlName="description" rows="3" class="w-full"
+              placeholder="Una breve descripción sobre ti, tus habilidades e intereses..."></textarea>
+            <small *ngIf="isInvalidField('description')" class="p-error">{{ getFieldError('description') }}</small>
           </div>
 
           <!-- Sección Académica -->
@@ -115,9 +124,9 @@
             </label>
             <select id="university" formControlName="university" class="w-full p-inputtext p-component mt-1">
               <option value="" disabled>Selecciona una universidad</option>
-              <option *ngFor="let uni of universities" [value]="uni">{{ uni }}</option>
+              <option *ngFor="let uni of universities" [value]="uni.value">{{ uni.label }}</option>
             </select>
-            <small *ngIf="getFieldError('university')" class="p-error">{{ getFieldError('university') }}</small>
+            <small *ngIf="isInvalidField('university')" class="p-error">{{ getFieldError('university') }}</small>
           </div>
 
           <div class="field">
@@ -126,7 +135,7 @@
               <i class="pi pi-info-circle cursor-pointer" pTooltip="El nombre de la carrera que estás cursando."></i>
             </label>
             <input id="career" type="text" pInputText formControlName="career" class="w-full mt-1" />
-            <small *ngIf="getFieldError('career')" class="p-error">{{ getFieldError('career') }}</small>
+            <small *ngIf="isInvalidField('career')" class="p-error">{{ getFieldError('career') }}</small>
           </div>
 
           <div class="field">
@@ -136,9 +145,9 @@
             </label>
             <select id="degreeStatus" formControlName="degreeStatus" class="w-full p-inputtext p-component mt-1">
               <option value="" disabled>Selecciona un estado</option>
-              <option *ngFor="let status of degreeStatuses" [value]="status">{{ status }}</option>
+              <option *ngFor="let status of degreeStatuses" [value]="status.value">{{ status.label }}</option>
             </select>
-            <small *ngIf="getFieldError('degreeStatus')" class="p-error">{{ getFieldError('degreeStatus') }}</small>
+            <small *ngIf="isInvalidField('degreeStatus')" class="p-error">{{ getFieldError('degreeStatus') }}</small>
           </div>
 
           <!-- Sección de Dirección -->
@@ -152,7 +161,7 @@
               <i class="pi pi-info-circle cursor-pointer" pTooltip="Nombre de la calle de tu domicilio."></i>
             </label>
             <input id="street" type="text" pInputText formControlName="street" class="w-full mt-1" />
-            <small *ngIf="getFieldError('street')" class="p-error">{{ getFieldError('street') }}</small>
+            <small *ngIf="isInvalidField('street')" class="p-error">{{ getFieldError('street') }}</small>
           </div>
 
           <div class="field">
@@ -161,7 +170,7 @@
               <i class="pi pi-info-circle cursor-pointer" pTooltip="Altura de la calle."></i>
             </label>
             <input id="number" type="number" pInputText formControlName="number" class="w-full mt-1" />
-            <small *ngIf="getFieldError('number')" class="p-error">{{ getFieldError('number') }}</small>
+            <small *ngIf="isInvalidField('number')" class="p-error">{{ getFieldError('number') }}</small>
           </div>
 
           <div class="field">
@@ -170,7 +179,7 @@
               <i class="pi pi-info-circle cursor-pointer" pTooltip="Tu código postal."></i>
             </label>
             <input id="postalCode" type="text" pInputText formControlName="postalCode" class="w-full mt-1" />
-            <small *ngIf="getFieldError('postalCode')" class="p-error">{{ getFieldError('postalCode') }}</small>
+            <small *ngIf="isInvalidField('postalCode')" class="p-error">{{ getFieldError('postalCode') }}</small>
           </div>
 
           <div class="field">
@@ -179,7 +188,7 @@
               <i class="pi pi-info-circle cursor-pointer" pTooltip="La ciudad de tu domicilio."></i>
             </label>
             <input id="city" type="text" pInputText formControlName="city" class="w-full mt-1" />
-            <small *ngIf="getFieldError('city')" class="p-error">{{ getFieldError('city') }}</small>
+            <small *ngIf="isInvalidField('city')" class="p-error">{{ getFieldError('city') }}</small>
           </div>
 
           <div class="field md:col-span-2">
@@ -189,9 +198,9 @@
             </label>
             <select id="province" formControlName="province" class="w-full p-inputtext p-component mt-1">
               <option value="" disabled>Selecciona una provincia</option>
-              <option *ngFor="let prov of provinces" [value]="prov">{{ prov }}</option>
+              <option *ngFor="let prov of provinces" [value]="prov.value">{{ prov.label }}</option>
             </select>
-            <small *ngIf="getFieldError('province')" class="p-error">{{ getFieldError('province') }}</small>
+            <small *ngIf="isInvalidField('province')" class="p-error">{{ getFieldError('province') }}</small>
           </div>
 
         </div>

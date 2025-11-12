@@ -5,6 +5,7 @@ import com.example.gestor_inversores.dto.RequestUserUpdateDTO;
 import com.example.gestor_inversores.dto.ResponseUserDTO;
 import com.example.gestor_inversores.mapper.UserMapper;
 import com.example.gestor_inversores.model.User;
+import com.example.gestor_inversores.repository.IUserRepository;
 import com.example.gestor_inversores.service.user.IUserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ public class UserController {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private IUserRepository userRepository;
 
     // GET ALL
     @GetMapping
@@ -78,5 +82,17 @@ public class UserController {
     public ResponseEntity<ResponseUserDTO> desactivateUser(@PathVariable Long id) {
         User updatedUser = userService.desactivateUser(id);
         return ResponseEntity.ok(userMapper.userToResponseUserDTO(updatedUser));
+    }
+
+    // ✅ Endpoint para validar si el username ya existe
+    @GetMapping("/check-username/{username}")
+    public ResponseEntity<Boolean> checkUsernameExists(@PathVariable String username) {
+        return ResponseEntity.ok(userRepository.findUserEntityByUsername(username).isPresent());
+    }
+
+    // ✅ Endpoint para validar si el email ya existe
+    @GetMapping("/check-email/{email}")
+    public ResponseEntity<Boolean> checkEmailExists(@PathVariable String email) {
+        return ResponseEntity.ok(userRepository.findByEmail(email).isPresent());
     }
 }

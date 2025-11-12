@@ -1,139 +1,245 @@
+/* Variables de tema para consistencia */
+:host {
+  --chat-primary-color: #4f46e5; /* Indigo 600 */
+  --chat-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); /* Indigo a Purple */
+}
+
 .chat-fab {
   position: fixed;
   bottom: 32px;
-  right: 32px;
-  background: #f0f0f0; /* Cambiado a gris claro para que el ícono contraste */
-  border-radius: 12px; /* Cambiado a cuadrado con bordes redondeados */
-  width: 72px;
-  height: 72px;
+  left: 32px; /* Movido a la izquierda */
+  background: var(--chat-gradient);
+  border-radius: 50%; /* Círculo perfecto */
+  width: 64px; /* Ligeramente más pequeño */
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   z-index: 1000;
-  transition: box-shadow 0.2s;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-  .chat-icon {
-    width: 56px;
-    height: 56px;
-    /* Se quita el filtro para mostrar los colores originales de la imagen */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 8px 24px rgba(79, 70, 229, 0.4);
+
+  .icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* La rotación se aplica aquí */
+
+    .chat-icon {
+      width: 100%; /* Ocupa todo el ancho del círculo */
+      height: 100%; /* Ocupa todo el alto del círculo */
+      border-radius: 50%; /* Asegura que la imagen también sea circular */
+      object-fit: cover; /* Evita que la imagen se distorsione */
+    }
+    .close-icon {
+      font-size: 2rem;
+      color: white;
+    }
   }
-  &.open {
-    background: #f0f0f0; /* Se mantiene gris claro cuando está abierto */
+
+  &.open .icon-wrapper {
+    transform: rotate(180deg);
   }
-  .close-icon {
-    color: white;
-    font-size: 1.5rem;
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 12px 32px rgba(79, 70, 229, 0.5);
   }
-  .minimize-icon {
-    color: #333; /* Cambiado a oscuro para ser visible */
-    font-size: 2.5rem; /* Hago el guion más grande y grueso */
-    line-height: 1;
+}
+
+/* Estilos para el Globo de Ayuda */
+.help-bubble {
+  position: fixed;
+  bottom: 40px;
+  left: 108px; /* Posicionado a la derecha del FAB (32px de margen + 64px de ancho + 12px de separación) */
+  background: var(--chat-primary-color);
+  color: white;
+  padding: 12px 18px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  font-size: 0.9rem;
+  font-weight: 500;
+  z-index: 999;
+  animation: fadeInOut 12s ease-in-out forwards; /* Animación de 12s (aparece, se mantiene, desaparece) */
+
+  /* La "colita" del globo de diálogo */
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 12px;
+    left: -8px;
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 8px solid var(--chat-primary-color);
   }
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; transform: translateY(10px); }
+  10%, 90% { opacity: 1; transform: translateY(0); }
 }
 
 .chat-window {
   position: fixed;
   bottom: 110px;
-  right: 32px;
-  width: 320px;
-  max-height: 500px; /* Altura máxima para la ventana del chat */
+  left: 32px; /* Movido a la izquierda */
+  width: 350px; /* Un poco más ancho */
+  max-height: 550px;
   max-width: 90vw;
   background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 32px rgba(0,0,0,0.2);
-  display: none;
+  border-radius: 16px; /* Bordes más redondeados */
+  box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+  display: flex;
   flex-direction: column;
   z-index: 1001;
+  /* Animación de entrada/salida */
+  transform: translateY(20px);
+  opacity: 0;
+  visibility: hidden;
+  transition: transform 0.3s ease, opacity 0.3s ease, visibility 0.3s;
+
   &.open {
-    display: flex;
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
   }
+
   .chat-header {
-    background: #0078d4;
+    background: var(--chat-gradient);
     color: #fff;
-    padding: 12px;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
+    padding: 16px;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     h3 {
       margin: 0;
-      font-size: 1.1rem;
+      font-size: 1.15rem;
+      font-weight: 600;
     }
     .close-btn {
       background: transparent;
       border: none;
-      font-size: 1.2rem;
+      color: white;
+      font-size: 1.4rem;
       cursor: pointer;
-      padding: 4px 8px;
-      border-radius: 8px;
-      transition: background-color 0.2s;
-
+      opacity: 0.8;
+      transition: opacity 0.2s, transform 0.2s;
       &:hover {
-        background-color: #d32f2f;
+        opacity: 1;
+        transform: scale(1.1);
       }
     }
   }
+
   .chat-body {
     padding: 16px;
     flex: 1;
     overflow-y: auto;
-    height: 300px; /* Altura fija para el cuerpo del chat */
+    height: 350px; /* Altura fija para el cuerpo del chat */
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
+
+    /* Animación de Entrada para los Mensajes */
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
     .message {
-      padding: 8px 12px;
-      border-radius: 12px;
+      padding: 10px 14px;
+      border-radius: 18px;
       font-size: 0.95rem;
       max-width: 80%;
+      line-height: 1.4;
+      animation: slideIn 0.3s ease-out; /* Aplicar la animación */
       &.received {
         background: #f1f1f1;
         align-self: flex-start;
+        border-bottom-left-radius: 4px;
       }
       &.sent {
-        background: #dcf8c6;
+        background: var(--chat-primary-color);
+        color: white;
         align-self: flex-end;
+        border-bottom-right-radius: 4px;
       }
+
+      /* Indicador de "Escribiendo..." */
+      &.typing-indicator {
+        padding: 14px 18px;
+        span {
+          height: 8px;
+          width: 8px;
+          background-color: #9ca3af; /* Gris 400 */
+          border-radius: 50%;
+          display: inline-block;
+          animation: bounce 1.4s infinite ease-in-out both;
+        }
+        span:nth-child(1) { animation-delay: -0.32s; }
+        span:nth-child(2) { animation-delay: -0.16s; }
+      }
+    }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1.0); }
     }
     .preset-questions {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 10px;
       margin-top: 12px;
       .preset-btn {
-        background-color: #eef;
-        border: 1px solid #cce;
+        background-color: #f3f4f6;
+        border: 1px solid #e5e7eb;
         border-radius: 16px;
-        padding: 6px 12px;
+        padding: 8px 14px;
         cursor: pointer;
         font-size: 0.9rem;
         transition: background-color 0.2s;
         &:hover {
-          background-color: #ddf;
+          background-color: #e5e7eb;
         }
       }
     }
   }
+
   .chat-footer {
-    padding: 12px;
+    padding: 16px;
     display: flex;
     gap: 8px;
+    border-top: 1px solid #e5e7eb;
     input {
       flex: 1;
-      padding: 8px;
-      border-radius: 6px;
+      padding: 10px;
+      border-radius: 8px;
       border: 1px solid #ccc;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      &:focus {
+        outline: none;
+        border-color: var(--chat-primary-color);
+        box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+      }
     }
     button {
-      background: #0078d4;
-      color: #fff;
+      background: var(--chat-primary-color);
+      color: white;
       border: none;
-      border-radius: 6px;
-      padding: 8px 16px;
+      border-radius: 8px;
+      padding: 0 16px;
       cursor: pointer;
+      transition: background-color 0.2s;
+      &:hover {
+        background: #4338ca; /* Indigo 700 */
+      }
     }
   }
 }

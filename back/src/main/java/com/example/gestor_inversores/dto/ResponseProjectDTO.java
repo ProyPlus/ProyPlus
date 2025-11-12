@@ -31,5 +31,6 @@ public class ResponseProjectDTO {
 
     // Lista de participantes
     private List<ResponseProjectStudentDTO> students;
+    private Boolean deleted;
 
 }

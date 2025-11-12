@@ -55,6 +55,9 @@ public class Earning {
     private LocalDate createdAt;
     private LocalDate confirmedAt;
 
+    @Column(nullable = false)
+    private int retryCount = 0;
+
     @ManyToOne
     @JoinColumn(name = "project_id", nullable = false)
     @NotNull

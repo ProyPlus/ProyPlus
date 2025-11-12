@@ -100,6 +100,17 @@ userItems = [
       });
     }
 
+    if (isAdmin) {
+     menu.push({
+       label: 'Gestión (Admin)',
+       icon: 'pi pi-briefcase',
+       items: [
+         { label: 'Gestión proyectos', icon: 'pi pi-list', routerLink: '/proyectos-gestion' },
+       ]
+     });
+   }
+
+ 
     // --- Sección de Configuración (Ej: solo Admin) ---
     if (isAdmin) {
       menu.push({

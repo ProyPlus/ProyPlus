@@ -1,4 +1,5 @@
 
+<p-confirmDialog></p-confirmDialog>
 <p-toast></p-toast>
 <div class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
   <div class="w-full max-w-4xl">
@@ -15,171 +16,177 @@
 
 
       <div class="field">
-        <label for="username">Usuario</label>
-        <input type="text" id="username" pInputText class="w-full" placeholder="Ingrese usuario" formControlName="username"/>
-        <div *ngIf="studentsUpdateForm.get('username')?.invalid && studentsUpdateForm.get('username')?.touched" class="text-red-500 text-sm">
-          <div *ngIf="studentsUpdateForm.get('username')?.errors?.['required']">El username es obligatorio.</div>
-          <div *ngIf="studentsUpdateForm.get('username')?.errors?.['maxlength']">Máximo 15 caracteres permitidos.</div>
-          <div *ngIf="studentsUpdateForm.get('username')?.errors?.['pattern']">Se permiten letras, espacios y estos simbolos (./,!&).</div>
-        </div>
+        <label for="username" class="font-medium flex items-center gap-2">
+          <span>Usuario</span>
+          <i class="pi pi-info-circle cursor-pointer" pTooltip="El nombre de usuario no se puede modificar. Si necesitas cambiarlo, por favor contacta a soporte."></i>
+        </label>
+        <input type="text" id="username" pInputText class="w-full" formControlName="username"/>
+        <small *ngIf="isInvalidField('username')" class="p-error">{{ getFieldError('username') }}</small>
+      </div>
+
+      <div class="field">
+        <label for="email" class="font-medium flex items-center gap-2">
+          <span>Email <span class="text-red-500">*</span></span>
+          <i class="pi pi-info-circle cursor-pointer" pTooltip="Tu dirección de correo electrónico principal."></i>
+        </label>
+        <input type="email" id="email" pInputText placeholder="Ingrese email" formControlName="email" class="w-full"/>
+        <small *ngIf="isInvalidField('email') || studentsUpdateForm.get('email')?.pending" class="p-error">{{ studentsUpdateForm.get('email')?.pending ? 'Comprobando disponibilidad...' : getFieldError('email') }}</small>
+      </div>
+
+      <div class="field">
+        <label for="firstName" class="font-medium flex items-center gap-2">
+          <span>Nombre <span class="text-red-500">*</span></span>
+          <i class="pi pi-info-circle cursor-pointer" pTooltip="Tu nombre de pila."></i>
+        </label>
+        <input type="text" id="firstName" placeholder="Ingrese nombre" pInputText formControlName="firstName" class="w-full"/>
+        <small *ngIf="isInvalidField('firstName')" class="p-error">{{ getFieldError('firstName') }}</small>
       </div>
 
 
       <div class="field">
-        <label for="email">Email</label>
-        <input type="email" id="configuracionEmail" pInputText placeholder="Ingrese email" formControlName="email" class="w-full"/>
-        <div *ngIf="studentsUpdateForm.get('email')?.invalid && studentsUpdateForm.get('email')?.touched" class="text-red-500 text-sm">
-            <div *ngIf="studentsUpdateForm.get('email')?.errors?.['required']">El email es obligatorio.</div>
-            <div *ngIf="studentsUpdateForm.get('email')?.errors?.['maxlength']">Máximo 30 caracteres permitidos.</div>
-            <div *ngIf="studentsUpdateForm.get('email')?.errors?.['email']">Formato de email inválido.</div>
-        </div>
-      </div>
-
-      <div class="field">
-        <label for="firstName">Nombre</label>
-        <input type="text" id="firstName" placeholder="Ingrese nombre" pInputText formControlName="firstName" class="w-full" />
-        <div *ngIf="studentsUpdateForm.get('firstName')?.invalid && studentsUpdateForm.get('firstName')?.touched" class="text-red-500 text-sm">
-          <div *ngIf="studentsUpdateForm.get('firstName')?.errors?.['required']">El nombre es obligatorio.</div>
-          <div *ngIf="studentsUpdateForm.get('firstName')?.errors?.['maxlength']">Máximo 15 caracteres permitidos.</div>
-          <div *ngIf="studentsUpdateForm.get('firstName')?.errors?.['pattern']">Solo se permiten letras y espacios.</div>
-        </div>
+        <label for="lastName" class="font-medium flex items-center gap-2">
+          <span>Apellido <span class="text-red-500">*</span></span>
+          <i class="pi pi-info-circle cursor-pointer" pTooltip="Tu apellido."></i>
+        </label>
+        <input type="text" id="lastName" pInputText placeholder="Ingrese apellido" formControlName="lastName" class="w-full"/>
+        <small *ngIf="isInvalidField('lastName')" class="p-error">{{ getFieldError('lastName') }}</small>
       </div>
 
 
       <div class="field">
-        <label for="lastName">Apellido</label>
-        <input type="text" id="lastName" pInputText placeholder="Ingrese apellido" formControlName="lastName" class="w-full" />
-        <div *ngIf="studentsUpdateForm.get('lastName')?.invalid && studentsUpdateForm.get('lastName')?.touched" class="text-red-500 text-sm">
-          <div *ngIf="studentsUpdateForm.get('lastName')?.errors?.['required']">El apellido es obligatorio.</div>
-          <div *ngIf="studentsUpdateForm.get('lastName')?.errors?.['maxlength']">Máximo 20 caracteres permitidos.</div>
-          <div *ngIf="studentsUpdateForm.get('lastName')?.errors?.['pattern']">Solo se permiten letras y espacios.</div>
-        </div>
+        <label for="dni" class="font-medium flex items-center gap-2">
+          <span>DNI</span>
+          <i class="pi pi-info-circle cursor-pointer" pTooltip="El DNI no se puede modificar. Si hay un error, por favor contacta a soporte."></i>
+        </label>
+        <input type="text" id="dni" pInputText placeholder="Ingrese DNI" formControlName="dni" class="w-full"/>
+        <small *ngIf="isInvalidField('dni')" class="p-error">{{ getFieldError('dni') }}</small>
       </div>
 
 
       <div class="field">
-        <label for="dni">DNI</label>
-        <input type="text" id="dni" pInputText placeholder="Ingrese DNI" formControlName="dni" class="w-full" />
-        <div *ngIf="studentsUpdateForm.get('dni')?.invalid && studentsUpdateForm.get('dni')?.touched" class="text-red-500 text-sm">
-        <div *ngIf="studentsUpdateForm.get('dni')?.errors?.['required']">El dni es obligatorio.</div>
-        <div *ngIf="studentsUpdateForm.get('dni')?.errors?.['maxlength']">Máximo 8 caracteres permitidos.</div>
-        <div *ngIf="studentsUpdateForm.get('dni')?.errors?.['pattern']">Solo se permiten números.</div>
-      </div>
-      </div>
-
-
-      <div class="field">
-        <label for="phone">Teléfono</label>
-        <input type="text" id="phone" pInputText placeholder="Ingrese teléfono" formControlName="phone" class="w-full" />
-        <div *ngIf="studentsUpdateForm.get('phone')?.invalid && studentsUpdateForm.get('phone')?.touched" class="text-red-500 text-sm">
-        <div *ngIf="studentsUpdateForm.get('phone')?.errors?.['required']">El teléfono es obligatorio.</div>
-        <div *ngIf="studentsUpdateForm.get('phone')?.errors?.['maxlength']">Máximo 13 caracteres permitidos.</div>
-        <div *ngIf="studentsUpdateForm.get('phone')?.errors?.['pattern']">Solo se permiten números.</div>
-      </div>
+        <label for="phone" class="font-medium flex items-center gap-2">
+          <span>Teléfono <span class="text-red-500">*</span></span>
+          <i class="pi pi-info-circle cursor-pointer" pTooltip="Un número de teléfono de contacto directo."></i>
+        </label>
+        <input type="text" id="phone" pInputText placeholder="Ingrese teléfono" formControlName="phone" class="w-full"/>
+        <small *ngIf="isInvalidField('phone')" class="p-error">{{ getFieldError('phone') }}</small>
       </div>
 
 
       <div class="field">
-        <label for="dateOfBirth">Fecha de nacimiento</label>
-        <input type="date" id="dateOfBirth" placeholder="Ingrese fecha de nacimiento" pInputText formControlName="dateOfBirth" class="w-full" />
-          <div *ngIf="studentsUpdateForm.get('dateOfBirth')?.invalid && studentsUpdateForm.get('dateOfBirth')?.touched" class="text-red-500 text-sm">
-          <div *ngIf="studentsUpdateForm.get('dateOfBirth')?.errors?.['required']">La fecha de nacimiento es obligatoria.</div>
-        </div>
+        <label for="dateOfBirth" class="font-medium flex items-center gap-2">
+          <span>Fecha de Nacimiento <span class="text-red-500">*</span></span>
+          <i class="pi pi-info-circle cursor-pointer" pTooltip="Tu fecha de nacimiento."></i>
+        </label>
+        <input type="date" id="dateOfBirth" placeholder="Ingrese fecha de nacimiento" pInputText formControlName="dateOfBirth" class="w-full"/>
+        <small *ngIf="isInvalidField('dateOfBirth')" class="p-error">{{ getFieldError('dateOfBirth') }}</small>
       </div>
 
 
       <div class="field">
-        <label for="configuracionUniversidad">Universidad</label>
-        <select id="configuracionUniversidad" formControlName="university">
+        <label for="configuracionUniversidad" class="font-medium flex items-center gap-2">
+          <span>Universidad <span class="text-red-500">*</span></span>
+          <i class="pi pi-info-circle cursor-pointer" pTooltip="La institución educativa donde estudias o estudiaste."></i>
+        </label>
+        <select id="configuracionUniversidad" formControlName="university" class="w-full p-inputtext p-component">
           <option value="" disabled>Seleccione una universidad</option>
-          <option *ngFor="let uni of universities" [value]="uni">{{ uni }}</option>
+          <option *ngFor="let uni of universities" [value]="uni.value">{{ uni.label }}</option>
         </select>
-        <div *ngIf="studentsUpdateForm.get('university')?.invalid && studentsUpdateForm.get('university')?.touched" class="text-red-500 text-sm">
-          <div *ngIf="studentsUpdateForm.get('university')?.errors?.['required']">La universidad es obligatoria.</div>
-        </div>
+        <small *ngIf="isInvalidField('university')" class="p-error">{{ getFieldError('university') }}</small>
       </div>
       <div class="field">
-        <label for="configuracionCarrera">Carrera</label>
-        <input type="text" id="configuracionCarrera" placeholder="Ingrese carrera" formControlName="career" autocomplete="off">
-        <div *ngIf="studentsUpdateForm.get('career')?.invalid && studentsUpdateForm.get('career')?.touched" class="text-red-500 text-sm">
-          <div *ngIf="studentsUpdateForm.get('career')?.errors?.['required']">La carrera es obligatoria.</div>
-        </div>
+        <label for="configuracionCarrera" class="font-medium flex items-center gap-2">
+          <span>Carrera <span class="text-red-500">*</span></span>
+          <i class="pi pi-info-circle cursor-pointer" pTooltip="El nombre de la carrera que estás cursando."></i>
+        </label>
+        <input type="text" id="configuracionCarrera" pInputText placeholder="Ingrese carrera" formControlName="career" autocomplete="off" class="w-full">
+        <small *ngIf="isInvalidField('career')" class="p-error">{{ getFieldError('career') }}</small>
       </div>
 
 
       <div class="field">
-        <label for="configuracionCarreraEstado">Estado</label>
-        <select id="configuracionCarreraEstado" formControlName="degreeStatus">
+        <label for="configuracionCarreraEstado" class="font-medium flex items-center gap-2">
+          <span>Estado de la Carrera <span class="text-red-500">*</span></span>
+          <i class="pi pi-info-circle cursor-pointer" pTooltip="Indica si estás cursando, si ya te graduaste o si has abandonado los estudios."></i>
+        </label>
+        <select id="configuracionCarreraEstado" formControlName="degreeStatus" class="w-full p-inputtext p-component">
           <option value="" disabled>Seleccione un estado</option>
-          <option *ngFor="let status of degreeStatuses" [value]="status">{{ status }}</option>
+          <option *ngFor="let status of degreeStatuses" [value]="status.value">{{ status.label }}</option>
         </select>
-        <div *ngIf="studentsUpdateForm.get('degreeStatus')?.invalid && studentsUpdateForm.get('degreeStatus')?.touched" class="text-red-500 text-sm">
-          <div *ngIf="studentsUpdateForm.get('degreeStatus')?.errors?.['required']">Debe seleccionar un estado.</div>
-        </div>
+        <small *ngIf="isInvalidField('degreeStatus')" class="p-error">{{ getFieldError('degreeStatus') }}</small>
       </div>
 
 
       <div class="field md:col-span-2">
-        <label for="redSocial">Red Social</label>
-        <input type="url" id="redSocial" pInputText placeholder="https://..." formControlName="redSocial" class="w-full" />
-        <div *ngIf="studentsUpdateForm.get('redSocial')?.invalid && studentsUpdateForm.get('redSocial')?.touched" class="text-red-500 text-sm">
-        <div *ngIf="studentsUpdateForm.get('redSocial')?.errors?.['pattern']">Debe ser una URL válida.</div>
+        <label for="linkedinUrl" class="font-medium flex items-center gap-2">
+          <span>URL de LinkedIn</span>
+          <i class="pi pi-info-circle cursor-pointer" pTooltip="Tu perfil de LinkedIn (opcional). Ayuda a los inversores a conocerte mejor."></i>
+        </label>
+        <input type="url" id="linkedinUrl" pInputText placeholder="https://www.linkedin.com/in/tu-perfil" formControlName="linkedinUrl" class="w-full"/>
+        <small *ngIf="isInvalidField('linkedinUrl')" class="p-error">{{ getFieldError('linkedinUrl') }}</small>
       </div>
-      </div>    
+
+      <div class="field md:col-span-2">
+        <label for="description" class="font-medium flex items-center gap-2">
+          <span>Descripción</span>
+          <i class="pi pi-info-circle cursor-pointer" pTooltip="Una breve descripción sobre ti, tus habilidades e intereses (opcional)."></i>
+        </label>
+        <textarea id="description" pInputTextarea formControlName="description" rows="3" class="w-full" placeholder="Una breve descripción sobre ti, tus habilidades e intereses..."></textarea>
+        <small *ngIf="isInvalidField('description')" class="p-error">{{ getFieldError('description') }}</small>
+      </div>
 
       <div formGroupName="address" class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4 border p-4 rounded-lg mt-2">
             <h3 class="md:col-span-3 font-semibold text-lg mb-2">Dirección</h3>
             <div class="field">
-              <label for="street">Calle</label>
-              <input id="street" type="text" pInputText placeholder="Ingrese calle"  formControlName="street" class="w-full" />
-              <div *ngIf="studentsUpdateForm.get('address.street')?.invalid && studentsUpdateForm.get('address.street')?.touched" class="text-red-500 text-sm">
-              <div *ngIf="studentsUpdateForm.get('address.street')?.errors?.['required']">La calle es obligatoria.</div>
-              <div *ngIf="studentsUpdateForm.get('address.street')?.errors?.['maxlength']">Máximo 50 caracteres permitidos.</div>
-              <div *ngIf="studentsUpdateForm.get('address.street')?.errors?.['pattern']">Solo se permiten letras y espacios.</div>
-            </div>
-            </div>
-            <div class="field">
-              <label for="number">Número</label>
-              <input id="number" type="text" pInputText placeholder="Ingrese número" formControlName="number" class="w-full" />
-              <div *ngIf="studentsUpdateForm.get('address.number')?.invalid && studentsUpdateForm.get('address.number')?.touched" class="text-red-500 text-sm">
-              <div *ngIf="studentsUpdateForm.get('address.number')?.errors?.['required']">El número es obligatorio.</div>
-              <div *ngIf="studentsUpdateForm.get('address.number')?.errors?.['maxlength']">Máximo 5 caracteres.</div>
-              <div *ngIf="studentsUpdateForm.get('address.number')?.errors?.['pattern']">Solo se permiten números.</div>
-            </div>
+              <label for="street" class="font-medium flex items-center gap-2">
+                <span>Calle <span class="text-red-500">*</span></span>
+                <i class="pi pi-info-circle cursor-pointer" pTooltip="Nombre de la calle de tu domicilio."></i>
+              </label>
+              <input id="street" type="text" pInputText placeholder="Ingrese calle" formControlName="street" class="w-full"/>
+              <small *ngIf="isInvalidField('street', addressFormGroup)" class="p-error">{{ getFieldError('street', addressFormGroup) }}</small>
             </div>
             <div class="field">
-              <label for="postalCode">Código Postal</label>
-              <input id="postalCode" type="text" pInputText placeholder="Ingrese código postal" formControlName="postalCode" class="w-full" />
-              <div *ngIf="studentsUpdateForm.get('address.postalCode')?.invalid && studentsUpdateForm.get('address.postalCode')?.touched" class="text-red-500 text-sm">
-              <div *ngIf="studentsUpdateForm.get('address.postalCode')?.errors?.['required']">El codigo postal es obligatorio.</div>
-              <div *ngIf="studentsUpdateForm.get('address.postalCode')?.errors?.['maxlength']">Máximo 4 caracteres.</div>
-              <div *ngIf="studentsUpdateForm.get('address.postalCode')?.errors?.['pattern']">Solo se permiten números.</div>
-            </div>
+              <label for="number" class="font-medium flex items-center gap-2">
+                <span>Número <span class="text-red-500">*</span></span>
+                <i class="pi pi-info-circle cursor-pointer" pTooltip="Altura de la calle."></i>
+              </label>
+              <input id="number" type="text" pInputText placeholder="Ingrese número" formControlName="number" class="w-full"/>
+              <small *ngIf="isInvalidField('number', addressFormGroup)" class="p-error">{{ getFieldError('number', addressFormGroup) }}</small>
             </div>
             <div class="field">
-              <label for="city">Ciudad</label>
-              <input id="city" type="text" pInputText placeholder="Ingrese ciudad" formControlName="city" class="w-full" />
-              <div *ngIf="studentsUpdateForm.get('address.city')?.invalid && studentsUpdateForm.get('address.city')?.touched" class="text-red-500 text-sm">
-              <div *ngIf="studentsUpdateForm.get('address.city')?.errors?.['required']">La ciudad es obligatoria.</div>
-              <div *ngIf="studentsUpdateForm.get('address.city')?.errors?.['maxlength']">Máximo 50 caracteres permitidos.</div>
-              <div *ngIf="studentsUpdateForm.get('address.city')?.errors?.['pattern']">Solo se permiten letras y espacios.</div>
+              <label for="postalCode" class="font-medium flex items-center gap-2">
+                <span>Código Postal <span class="text-red-500">*</span></span>
+                <i class="pi pi-info-circle cursor-pointer" pTooltip="Tu código postal."></i>
+              </label>
+              <input id="postalCode" type="text" pInputText placeholder="Ingrese código postal" formControlName="postalCode" class="w-full"/>
+              <small *ngIf="isInvalidField('postalCode', addressFormGroup)" class="p-error">{{ getFieldError('postalCode', addressFormGroup) }}</small>
             </div>
+            <div class="field">
+              <label for="city" class="font-medium flex items-center gap-2">
+                <span>Ciudad <span class="text-red-500">*</span></span>
+                <i class="pi pi-info-circle cursor-pointer" pTooltip="La ciudad de tu domicilio."></i>
+              </label>
+              <input id="city" type="text" pInputText placeholder="Ingrese ciudad" formControlName="city" class="w-full"/>
+              <small *ngIf="isInvalidField('city', addressFormGroup)" class="p-error">{{ getFieldError('city', addressFormGroup) }}</small>
             </div>
             <div class="field md:col-span-2">
-              <label for="province">Provincia</label>
-              <input id="province" type="text" pInputText placeholder="Ingrese provincia" formControlName="province" class="w-full" />
-              <div *ngIf="studentsUpdateForm.get('address.province')?.invalid && studentsUpdateForm.get('address.province')?.touched" class="text-red-500 text-sm">
-              <div *ngIf="studentsUpdateForm.get('address.province')?.errors?.['required']">La provincia es obligatoria.</div>
-              <div *ngIf="studentsUpdateForm.get('address.province')?.errors?.['maxlength']">Máximo 30 caracteres permitidos.</div>
-              <div *ngIf="studentsUpdateForm.get('address.province')?.errors?.['pattern']">Solo se permiten letras y espacios.</div>
-            </div>
+              <label for="province" class="font-medium flex items-center gap-2">
+                <span>Provincia <span class="text-red-500">*</span></span>
+                <i class="pi pi-info-circle cursor-pointer" pTooltip="La provincia de tu domicilio."></i>
+              </label>
+              <select id="province" formControlName="province" class="w-full p-inputtext p-component">
+                <option value="" disabled>Seleccione una provincia</option>
+                <option *ngFor="let prov of provinces" [value]="prov.value">{{ prov.label }}</option>
+              </select>
+              <small *ngIf="isInvalidField('province', addressFormGroup)" class="p-error">{{ getFieldError('province', addressFormGroup) }}</small>
             </div>
           </div>
         </div>
 
       <div class="flex justify-end gap-2 mt-6">
-        <button pButton type="submit" label="Guardar Cambios" icon="pi pi-check" class="save-button" [loading]="isLoading" [disabled]="studentsUpdateForm.invalid || isLoading"></button>
-        <button pButton type="button" label="Cancelar" class="cancel-button" (click)="cancelar()"></button>
+        <button pButton type="button" label="Eliminar Cuenta" icon="pi pi-trash" severity="danger" (click)="confirmDeleteAccount()"></button>
+        <button pButton type="submit" label="Guardar Cambios" icon="pi pi-check" class="p-button-success" [loading]="isLoading" [disabled]="studentsUpdateForm.invalid || isLoading"></button>
+        <button pButton type="button" label="Cancelar" class="p-button-secondary" (click)="cancelar()"></button>
       </div>    
     </form>
     </p-card>

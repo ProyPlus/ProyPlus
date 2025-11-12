@@ -1,5 +1,6 @@
 package com.example.gestor_inversores.service.investment;
 
+import com.example.gestor_inversores.dto.RequestContractActionByStudentDTO;
 import com.example.gestor_inversores.dto.RequestInvestmentActionByInvestorDTO;
 import com.example.gestor_inversores.dto.ResponseInvestmentDTO;
 import com.example.gestor_inversores.model.enums.InvestmentStatus;
@@ -29,9 +30,13 @@ public interface IInvestmentService {
 
     ResponseInvestmentDTO rejectOverfunded(Long investmentId, Long studentId);
 
+    ResponseInvestmentDTO confirmRefundSentByStudent(Long investmentId, RequestContractActionByStudentDTO dto);
+
     // 💡 Acciones del inversor
     ResponseInvestmentDTO confirmPaymentSent(Long investmentId, RequestInvestmentActionByInvestorDTO dto);
     ResponseInvestmentDTO confirmRefund(Long investmentId, RequestInvestmentActionByInvestorDTO dto);
+    ResponseInvestmentDTO markRefundAsNotReceived(Long investmentId, RequestInvestmentActionByInvestorDTO dto);
+
 
     List<ResponseInvestmentDTO> getByInvestor(Long investorId, InvestmentStatus status);
 

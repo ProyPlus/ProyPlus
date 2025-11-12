@@ -95,7 +95,8 @@ reload(): void {
     this.loading = true;
     this.svc.getAllByTag(tag).subscribe({
       next: (list) => {
-        this.projects = (list || []).map(p => ({ ...p, category: p.category ?? '—', status: p.status ?? 'IN_PROGRESS' }));
+        // FIX: Se elimina el mapeo redundante. El servicio ya adapta los datos.
+        this.projects = list || [];
         this.applyFilters();
       },
       error: (err) => {
@@ -121,6 +122,25 @@ reload(): void {
   private buildCategories(): void {
     const set = new Set<string>(this.projects.map(p => p.category ?? '—'));
     this.categories = Array.from(set).sort((a,b)=>a.localeCompare(b));
+  }
+
+  getProjectStatusLabel(status: string | null | undefined): string {
+    switch (status) {
+      case 'PENDING_FUNDING': return 'Pendiente de Financiación';
+      case 'IN_PROGRESS': return 'En Progreso';
+      case 'COMPLETED': return 'Completado';
+      case 'CANCELLED': return 'Cancelado';
+      case 'IDEA': return 'Idea';
+      case 'MVP': return 'MVP';
+      case 'FUNDING': return 'En Financiación';
+      case 'NOT_FUNDED': return 'No Financiado';
+      case 'DELETED': return 'Eliminado';
+      default: return status || 'No definido';
+    }
+  }
+
+  getCategoryLabel(category: string | null | undefined): string {
+    return !category || category === '—' ? 'Sin categoría' : category;
   }
 
   openDetail(p: IProject): void {

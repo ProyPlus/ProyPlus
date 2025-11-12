@@ -59,6 +59,9 @@ public class Investment {
     private boolean deleted = false;
     private LocalDate deletedAt;
 
+    @Column(nullable = false, columnDefinition = "int default 0")
+    private int retryCount = 0;
+
     // Investment.java
     @OneToOne(mappedBy = "investment")
     private Contract contract; // opcional, solo para navegación

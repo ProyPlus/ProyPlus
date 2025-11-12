@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -18,9 +18,10 @@ interface Message {
   templateUrl: './chatbot.component.html',
   styleUrls: ['./chatbot.component.scss'],
 })
-export class ChatbotComponent {
+export class ChatbotComponent implements OnInit {
   isChatOpen = false;
   shouldShowChatbot = true;
+  showHelpBubble = false; // Nuevo estado para el globo de ayuda
 
   userMessage = '';
   messages: Message[] = [
@@ -33,8 +34,21 @@ export class ChatbotComponent {
     });
   }
 
+  ngOnInit(): void {
+    // Mostrar el globo de ayuda después de 3 segundos
+    setTimeout(() => {
+      this.showHelpBubble = true;
+    }, 3000);
+
+    // Ocultar el globo de ayuda después de 15 segundos en total
+    setTimeout(() => {
+      this.showHelpBubble = false;
+    }, 15000);
+  }
+
   toggleChat() {
     this.isChatOpen = !this.isChatOpen;
+    this.showHelpBubble = false; // Ocultar el globo permanentemente al interactuar
   }
 
   selectQuestion(question: string) {

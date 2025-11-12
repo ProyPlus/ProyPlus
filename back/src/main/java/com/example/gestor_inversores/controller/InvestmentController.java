@@ -41,6 +41,13 @@ public class InvestmentController {
         return ResponseEntity.ok(service.rejectOverfunded(investmentId, dto.getStudentId()));
     }
 
+    @PutMapping("/confirm-refund-sent/{id}")
+    public ResponseEntity<ResponseInvestmentDTO> confirmRefundSent(
+            @PathVariable("id") Long investmentId,
+            @RequestBody @Valid RequestContractActionByStudentDTO dto) {
+        return ResponseEntity.ok(service.confirmRefundSentByStudent(investmentId, dto));
+    }
+
     // 💡 --- ACCIONES DEL INVERSOR ---
 
     @PutMapping("/confirm-payment-sent/{id}")
@@ -60,6 +67,13 @@ public class InvestmentController {
             @PathVariable("id") Long investmentId,
             @Valid @RequestBody RequestInvestmentActionByInvestorDTO dto) {
         return ResponseEntity.ok(service.confirmRefund(investmentId, dto));
+    }
+
+    @PutMapping("/mark-refund-not-received/{id}")
+    public ResponseEntity<ResponseInvestmentDTO> markRefundAsNotReceived(
+            @PathVariable("id") Long investmentId,
+            @Valid @RequestBody RequestInvestmentActionByInvestorDTO dto) {
+        return ResponseEntity.ok(service.markRefundAsNotReceived(investmentId, dto));
     }
 
     // 💡 --- CONSULTAS ---

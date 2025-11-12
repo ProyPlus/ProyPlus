@@ -21,7 +21,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ContractService implements IContractService {
@@ -70,7 +72,8 @@ public class ContractService implements IContractService {
             throw new BusinessException("Este proyecto ya no acepta nuevas ofertas de inversión porque ya está financiado o completado.");
         }
 
-        validateOfferAmount(project, dto.getAmount(), dto.getCurrency());
+        // Se elimina la validación estricta aquí para permitir ofertas que puedan sobrefinanciar.
+        // validateOfferAmount(project, dto.getAmount(), dto.getCurrency());
 
         BigDecimal profit1 = dto.getProfit1Year() != null && dto.getProfit1Year().compareTo(BigDecimal.ONE) > 0 ? dto.getProfit1Year().divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP) : dto.getProfit1Year();
         BigDecimal profit2 = dto.getProfit2Years() != null && dto.getProfit2Years().compareTo(BigDecimal.ONE) > 0 ? dto.getProfit2Years().divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP) : dto.getProfit2Years();
@@ -121,7 +124,8 @@ public class ContractService implements IContractService {
             throw new ContractCannotBeModifiedException("Solo se pueden modificar contratos en estado de borrador (DRAFT).");
 
         if (dto.getAmount() != null) {
-            validateOfferAmount(contract.getProject(), dto.getAmount(), dto.getCurrency() != null ? dto.getCurrency() : contract.getCurrency());
+            // Se elimina la validación estricta para permitir la sobrefinanciación.
+            // validateOfferAmount(contract.getProject(), dto.getAmount(), dto.getCurrency() != null ? dto.getCurrency() : contract.getCurrency());
         }
 
         if (dto.getTextTitle() != null && !dto.getTextTitle().equalsIgnoreCase(contract.getTextTitle())) {
@@ -420,7 +424,7 @@ public class ContractService implements IContractService {
 
     @Override
     public ResponseContractDTO refundContract(Long contractId, RequestContractActionByStudentDTO dto) {
-        return handleStudentAction(contractId, dto, ContractStatus.REFUNDED);
+        return handleStudentAction(contractId, dto, ContractStatus.PENDING_REFUND);
     }
 
     private ResponseContractDTO handleStudentAction(Long contractId, RequestContractActionByStudentDTO dto, ContractStatus actionStatus) {
@@ -446,7 +450,7 @@ public class ContractService implements IContractService {
                     throw new ContractCannotBeModifiedException("El contrato no puede cancelarse en su estado actual.");
                 }
             }
-            case REFUNDED -> {
+            case PENDING_REFUND -> {
                 if (contract.getStatus() != ContractStatus.SIGNED &&
                         contract.getStatus() != ContractStatus.CLOSED) {
                     throw new ContractCannotBeModifiedException("Solo contratos firmados o cerrados pueden devolverse al inversor.");
@@ -478,8 +482,9 @@ public class ContractService implements IContractService {
                     inv.setStatus(InvestmentStatus.CANCELLED);
                     investmentRepo.save(inv);
                 }
-                case REFUNDED -> {
-                    investmentService.returnInvestment(inv.getIdInvestment());
+                case PENDING_REFUND -> {
+                    inv.setStatus(InvestmentStatus.PENDING_REFUND);
+                    investmentRepo.save(inv);
                 }
                 case CLOSED -> {
                     contractRepository.save(contract);
@@ -509,22 +514,20 @@ public class ContractService implements IContractService {
                 student.getLastName()
             );
             mailService.sendEmail(toInvestor, subject, body);
-        } else if (actionStatus == ContractStatus.REFUNDED) {
-            String toInvestor = contract.getCreatedByInvestor().getEmail();
-            String subject = String.format("Inicio de Devolución para el proyecto '%s'", contract.getProject().getName());
+        } else if (actionStatus == ContractStatus.PENDING_REFUND) {
+            String toStudent = student.getEmail();
+            String subject = String.format("Has iniciado la devolución para el proyecto '%s'", contract.getProject().getName());
             String body = String.format(
-                "Hola %s,\n\nTe informamos que el estudiante %s %s ha iniciado el proceso de devolución de tu inversión de %.2f %s para el proyecto '%s'.\n\n" +
-                "El estado de tu inversión ahora es 'PENDIENTE DE DEVOLUCIÓN'.\n\n" +
-                "Acción Requerida: Una vez que hayas verificado la recepción de los fondos en tu cuenta, por favor, ingresa a la plataforma y confirma la recepción de la devolución para cerrar el ciclo por completo.\n\n" +
+                "Hola %s,\n\nHas iniciado el proceso de devolución de la inversión de %.2f %s para el proyecto '%s'.\n\n" +
+                "El estado del contrato ahora es 'PENDIENTE DE DEVOLUCIÓN'.\n\n" +
+                "Acción Requerida: El siguiente paso es realizar la transferencia de los fondos al inversor. Una vez que lo hayas hecho, por favor, ingresa a la plataforma y confirma que has enviado la devolución para notificar al inversor.\n\n" +
                 "Saludos,\nEl equipo de ProyPlus",
-                contract.getCreatedByInvestor().getUsername(),
                 student.getFirstName(),
-                student.getLastName(),
                 contract.getAmount(),
                 contract.getCurrency(),
                 contract.getProject().getName()
             );
-            mailService.sendEmail(toInvestor, subject, body);
+            mailService.sendEmail(toStudent, subject, body);
         }
 
         return contractMapper.toResponseDTO(contract);
@@ -614,26 +617,35 @@ public class ContractService implements IContractService {
                 .toList();
     }
 
+    @Override
+    public Map<String, Boolean> checkContractExists(Long projectId, String contractName) {
+        boolean exists = contractRepository.existsByProjectIdProjectAndTextTitleIgnoreCase(projectId, contractName);
+        return Collections.singletonMap("exists", exists);
+    }
+
     public void saveContract(Contract contract) {
         contractRepository.save(contract);
     }
 
-    private void validateOfferAmount(Project project, BigDecimal amount, Currency currency) {
-        BigDecimal remainingBudget = project.getBudgetGoal().subtract(project.getCurrentGoal());
-        BigDecimal offerAmountInUSD = amount;
-
-        if (currency != Currency.USD) {
-            if (currencyConversionService == null) {
-                throw new IllegalStateException("El servicio de conversión de moneda no está disponible.");
-            }
-            offerAmountInUSD = currencyConversionService.getConversionRate(currency.name(), "USD")
-                    .getRate().multiply(amount);
-        }
-
-        if (offerAmountInUSD.compareTo(remainingBudget) > 0) {
-            throw new BusinessException(String.format(
-                    "El monto de la oferta (%.2f USD) supera el capital restante para financiar el proyecto (%.2f USD).",
-                    offerAmountInUSD, remainingBudget));
-        }
-    }
+    // El método validateOfferAmount ya no es necesario en este servicio, se puede eliminar o dejar comentado.
+    /*
+     private void validateOfferAmount(Project project, BigDecimal amount, Currency currency) {
+         BigDecimal remainingBudget = project.getBudgetGoal().subtract(project.getCurrentGoal());
+         BigDecimal offerAmountInUSD = amount;
+ 
+         if (currency != Currency.USD) {
+             if (currencyConversionService == null) {
+                 throw new IllegalStateException("El servicio de conversión de moneda no está disponible.");
+             }
+             offerAmountInUSD = currencyConversionService.getConversionRate(currency.name(), "USD")
+                     .getRate().multiply(amount);
+         }
+ 
+         if (offerAmountInUSD.compareTo(remainingBudget) > 0) {
+             throw new BusinessException(String.format(
+                     "El monto de la oferta (%.2f USD) supera el capital restante para financiar el proyecto (%.2f USD).",
+                     offerAmountInUSD, remainingBudget));
+         }
+     }
+    */
 }

@@ -1,0 +1,209 @@
+<div class="landing-page bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+
+  <!-- Header -->
+  <header class="landing-header fixed top-0 left-0 right-0 z-50 p-4 flex justify-between items-center">
+    <div class="logo text-2xl font-bold text-primary-500">
+      Proy+
+    </div>
+    <div class="actions flex items-center gap-2">
+      <button pButton label="Iniciar Sesión" class="p-button-text" (click)="navigateToLogin()"></button>
+      <button pButton label="Registrarse" class="p-button-warning" (click)="navigateToRegister()"></button>
+    </div>
+  </header>
+
+  <main class="pt-20">
+    <!-- Hero Section -->
+    <section class="hero-section relative py-24 px-4 overflow-hidden">
+      <div class="absolute inset-0 bg-gray-100 dark:bg-gray-800 hero-bg"></div>
+      <div class="relative z-10 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        <div class="hero-text text-center md:text-left">
+          <h1 class="text-6xl font-extrabold mb-4 text-primary-500 tracking-tight">Sobre nosotros</h1>
+          <p class="text-xl max-w-xl mx-auto md:mx-0 text-gray-600 dark:text-gray-300">
+            Proy+ nació de la visión de crear un puente entre el talento universitario emergente y las oportunidades de financiación reales. Somos un equipo apasionado por la innovación y creemos que las grandes ideas no deberían quedarse en el aula. Nuestra plataforma utiliza tecnología de punta para facilitar conexiones significativas, permitiendo que los estudiantes den vida a sus proyectos y que los inversores descubran el próximo gran avance.
+          </p>
+        </div>
+        <div class="hero-image-container">
+          <img src="assets/images/ProyplusTransparente.png" alt="Logo de Proy+" class="hero-logo-image">
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section py-8 bg-white dark:bg-gray-800/50">
+      <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+        <div class="stat-item">
+          <ng-container *ngIf="!loadingStats(); else statSkeleton">
+            <div class="text-4xl font-bold text-primary-500">{{ stats()?.projects ?? 0 }}+</div>
+          </ng-container>
+          <div class="text-lg text-gray-500 dark:text-gray-400">Proyectos Publicados</div>
+        </div>
+        <div class="stat-item">
+          <ng-container *ngIf="!loadingStats(); else statSkeleton">
+            <div class="text-4xl font-bold text-primary-500">{{ stats()?.students ?? 0 }}+</div>
+          </ng-container>
+          <div class="text-lg text-gray-500 dark:text-gray-400">Estudiantes Registrados</div>
+        </div>
+        <div class="stat-item">
+          <ng-container *ngIf="!loadingStats(); else statSkeleton">
+            <div class="text-4xl font-bold text-primary-500">{{ stats()?.investors ?? 0 }}+</div>
+          </ng-container>
+          <div class="text-lg text-gray-500 dark:text-gray-400">Inversores Activos</div>
+        </div>
+        <ng-template #statSkeleton>
+          <p-skeleton width="6rem" height="2.5rem" styleClass="mx-auto"></p-skeleton>
+        </ng-template>
+      </div>
+    </section>
+
+    <!-- Value Proposition Section -->
+    <section class="value-prop-section py-16 px-4">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="text-3xl font-bold text-center mb-4">Nuestra Propuesta de Valor</h2>
+        <p class="text-center text-lg opacity-80 max-w-3xl mx-auto mb-12">Proyplus es la plataforma de conexión inteligente que revoluciona cómo las ideas se convierten en empresas. No solo mostramos proyectos; usamos Inteligencia Artificial para crear oportunidades reales.</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+          <!-- Card 1: AI Tagging -->
+          <div class="p-card p-6 bg-white dark:bg-gray-800/50 rounded-lg shadow-lg hover:shadow-primary-500/20 transition-shadow">
+            <div class="flex items-center mb-4">
+              <i class="pi pi-tags text-3xl text-primary-500 mr-4"></i>
+              <h3 class="text-xl font-semibold">Para Estudiantes</h3>
+            </div>
+            <p class="opacity-70">
+              Maximizamos la visibilidad de tu proyecto. Nuestra IA analiza, clasifica y etiqueta tu idea para que llegue directamente a los inversores correctos interesados en tu sector.
+            </p>
+          </div>
+
+          <!-- Card 2: Risk Analysis -->
+          <div class="p-card p-6 bg-white dark:bg-gray-800/50 rounded-lg shadow-lg hover:shadow-primary-500/20 transition-shadow">
+            <div class="flex items-center mb-4">
+              <i class="pi pi-chart-bar text-3xl text-primary-500 mr-4"></i>
+              <h3 class="text-xl font-semibold">Para Inversores</h3>
+            </div>
+            <p class="opacity-70">
+              Minimizamos el riesgo y maximizamos la oportunidad. Nuestra IA te proporciona un análisis de riesgo objetivo (Bajo, Medio, Alto) permitiéndote tomar decisiones de inversión informadas y seguras.
+            </p>
+          </div>
+
+          <!-- Card 3: AI Chatbot -->
+          <div class="p-card p-6 bg-white dark:bg-gray-800/50 rounded-lg shadow-lg hover:shadow-primary-500/20 transition-shadow">
+            <div class="flex items-center mb-4">
+              <i class="pi pi-comments text-3xl text-primary-500 mr-4"></i>
+              <h3 class="text-xl font-semibold">Soporte 24/7 con Chatbot IA</h3>
+            </div>
+            <p class="opacity-70">
+              ¿Tienes dudas? Nuestro asistente virtual te guía en cada paso, desde cómo subir tu proyecto hasta cómo realizar tu primera inversión, de forma instantánea.
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Image Carousel Section -->
+    <section class="carousel-section py-16 px-4">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="text-3xl font-bold text-center mb-12">Impulsando Conexiones Reales</h2>
+        <p-carousel [value]="carouselImages" [numVisible]="1" [numScroll]="1" [circular]="true" [autoplayInterval]="5000">
+          <ng-template let-image pTemplate="item">
+            <div class="carousel-item-content">
+              <img [src]="image.path" [alt]="image.alt" class="w-full h-auto rounded-lg shadow-xl" />
+            </div>
+          </ng-template>
+        </p-carousel>
+        <p class="text-center mt-8 opacity-70 max-w-3xl mx-auto">
+          Más allá de la tecnología, Proy+ es un ecosistema de colaboración donde las ideas se encuentran con la oportunidad,
+          y las visiones se transforman en proyectos tangibles.
+        </p>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works-section py-16 px-4 bg-gray-100 dark:bg-gray-800">
+      <div class="max-w-4xl mx-auto text-center">
+        <h2 class="text-3xl font-bold mb-12">¿Cómo Funciona?</h2>
+        <div class="flex flex-col md:flex-row justify-center items-center gap-8">
+          <!-- Step 1 -->
+          <div class="step text-center max-w-xs">
+            <div class="step-icon bg-primary-500/10 text-primary-500 border-2 border-primary-500/20 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+              <i class="pi pi-cloud-upload text-3xl"></i>
+            </div>
+            <h4 class="text-lg font-semibold">1. Publica tu Proyecto</h4>
+            <p class="opacity-70">Los estudiantes describen su idea, establecen una meta de financiación y suben su proyecto a la plataforma.</p>
+          </div>
+
+          <i class="pi pi-arrow-right text-2xl opacity-30 hidden md:block mx-4"></i>
+          <i class="pi pi-arrow-down text-2xl opacity-50 md:hidden my-4"></i>
+
+          <!-- Step 2 -->
+          <div class="step text-center max-w-xs">
+            <div class="step-icon bg-primary-500/10 text-primary-500 border-2 border-primary-500/20 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+              <i class="pi pi-eye text-3xl"></i>
+            </div>
+            <h4 class="text-lg font-semibold">2. Descubre y Analiza</h4>
+            <p class="opacity-70">Los inversores exploran los proyectos, utilizan el análisis de riesgo y contactan a los equipos para negociar.</p>
+          </div>
+
+          <i class="pi pi-arrow-right text-2xl opacity-30 hidden md:block mx-4"></i>
+          <i class="pi pi-arrow-down text-2xl opacity-50 md:hidden my-4"></i>
+
+          <!-- Step 3 -->
+          <div class="step text-center max-w-xs">
+            <div class="step-icon bg-primary-500/10 text-primary-500 border-2 border-primary-500/20 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+              <i class="pi pi-check-circle text-3xl"></i>
+            </div>
+            <h4 class="text-lg font-semibold">3. Financia el Futuro</h4>
+            <p class="opacity-70">Se firman los contratos y se transfiere la inversión, convirtiendo las ideas innovadoras en realidad.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contract Security Section -->
+    <section class="security-section py-20 px-4">
+      <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <div class="security-text">
+          <h2 class="text-3xl font-bold mb-6">Seguridad y Transparencia en Cada Acuerdo</h2>
+          <p class="opacity-80 mb-8">
+            En Proy+, la confianza es nuestra prioridad. Por eso, hemos diseñado un sistema de contratos robusto y transparente que protege tanto a estudiantes como a inversores en cada etapa del proceso.
+          </p>
+          <ul class="space-y-6">
+            <li class="flex items-start">
+              <i class="pi pi-check-circle text-green-500 mt-1 mr-4 text-xl"></i>
+              <div>
+                <h4 class="font-semibold">Negociación Transparente</h4>
+                <p class="text-sm opacity-70">Todos los términos se discuten y aprueban por ambas partes en un borrador antes de la firma, asegurando un acuerdo claro y sin sorpresas.</p>
+              </div>
+            </li>
+            <li class="flex items-start">
+              <i class="pi pi-check-circle text-green-500 mt-1 mr-4 text-xl"></i>
+              <div>
+                <h4 class="font-semibold">Flujos de Pago Guiados</h4>
+                <p class="text-sm opacity-70">La plataforma te guía paso a paso en los procesos de inversión y devolución, mostrando siempre el estado actual y las acciones requeridas.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="security-image-container text-center">
+          <img src="assets/images/contrato.png" alt="Ilustración de un contrato seguro" class="security-image">
+        </div>
+      </div>
+    </section>
+
+    <!-- Final CTA Section -->
+    <section class="final-cta-section py-20 px-4 text-center">
+      <h2 class="text-4xl font-bold mb-4">¿Listo para empezar?</h2>
+      <p class="text-lg max-w-3xl mx-auto mb-8 opacity-80">
+        Nuestra visión es ser el ecosistema de innovación líder en Latinoamérica, donde cada proyecto universitario con potencial es descubierto, financiado y escalado para generar un impacto tangible.
+      </p>
+      <button pButton label="Crear mi cuenta ahora" class="p-button-lg p-button-warning" (click)="navigateToRegister()"></button>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="landing-footer bg-gray-800 text-gray-300 py-4 px-4">
+    <div class="text-center">
+      <p class="text-sm opacity-60">&copy; {{ ('' | date:'yyyy') }} Proy+. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+</div>

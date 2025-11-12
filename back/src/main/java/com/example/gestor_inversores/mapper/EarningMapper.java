@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class EarningMapper {
 
+    private static final int MAX_RETRIES = 3;
+
     public ResponseEarningDTO toResponse(Earning e) {
         ResponseEarningDTO dto = new ResponseEarningDTO();
         dto.setIdEarning(e.getIdEarning());
@@ -22,7 +24,16 @@ public class EarningMapper {
         dto.setProjectId(e.getProject().getIdProject());
         dto.setGeneratedById(e.getGeneratedBy().getId());
         dto.setConfirmedById(e.getConfirmedBy() != null ? e.getConfirmedBy().getId() : null);
+
+        // Calcular y establecer los reintentos restantes
+        int retriesLeft = MAX_RETRIES - e.getRetryCount();
+        dto.setRetriesLeft(retriesLeft);
+
         return dto;
     }
 
+    // Sobrecarga del método para mantener compatibilidad si se necesita
+    public ResponseEarningDTO toDTO(Earning earning) {
+        return toResponse(earning);
+    }
 }

@@ -1,0 +1,166 @@
+:host {
+  display: block;
+  padding: 1rem;
+}
+
+.investment-detail-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0;
+  }
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.project-card, .earnings-section .p-card {
+  height: 100%;
+}
+
+.card-header {
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--surface-border);
+
+  .project-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+  }
+}
+
+.project-summary {
+  padding: 1rem 1.5rem;
+  color: var(--text-color-secondary);
+  line-height: 1.6;
+}
+
+.project-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  padding: 0 1.5rem 1rem;
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    .label {
+      font-size: 0.875rem;
+      color: var(--text-color-secondary);
+    }
+    .value {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .amount {
+      color: var(--primary-color);
+    }
+  }
+}
+
+.funding-progress {
+  padding: 0 1.5rem 1rem;
+  .label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-color-secondary);
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-color-secondary);
+
+  i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+  }
+
+  p {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin: 0 0 0.5rem;
+  }
+}
+
+.card-skeleton {
+  .p-skeleton {
+    border-radius: 1rem;
+  }
+}
+
+::ng-deep .earnings-section {
+  .p-card-content {
+    padding: 0 !important;
+  }
+}
+
+.projection-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+  }
+}
+
+.projection-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0; // Remove gap to make it look like a table
+  border: 1px solid var(--surface-border);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.projection-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.25rem;
+  padding: 1rem;
+  background-color: var(--surface-card);
+
+  .term {
+    color: var(--text-color-secondary);
+  }
+
+  .profit {
+    font-weight: 700;
+    color: var(--green-500) !important; // Aseguramos el color verde
+  }
+}

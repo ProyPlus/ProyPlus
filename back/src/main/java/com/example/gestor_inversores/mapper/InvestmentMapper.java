@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class InvestmentMapper {
 
+    private static final int MAX_RETRIES = 3;
+
     public ResponseInvestmentDTO toResponse(Investment inv) {
         ResponseInvestmentDTO dto = new ResponseInvestmentDTO();
         dto.setIdInvestment(inv.getIdInvestment());
@@ -18,6 +20,7 @@ public class InvestmentMapper {
         dto.setGeneratedById(inv.getGeneratedBy().getId());
         dto.setProjectId(inv.getProject().getIdProject());
         dto.setConfirmedByStudentId(inv.getConfirmedBy() != null ? inv.getConfirmedBy().getId() : null);
+        dto.setRemainingRetries(MAX_RETRIES - inv.getRetryCount());
         return dto;
     }
 

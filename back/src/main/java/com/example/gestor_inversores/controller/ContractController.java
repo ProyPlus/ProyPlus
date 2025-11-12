@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/contracts")
@@ -114,5 +115,12 @@ public class ContractController {
             List<ResponseContractDTO> contracts = contractService.getContractsByInvestorAndProject(investorId, projectId);
 
             return ResponseEntity.status(HttpStatus.OK).body(contracts);
+    }
+
+    @GetMapping("/exists")
+    public ResponseEntity<Map<String, Boolean>> checkContractExists(
+            @RequestParam Long projectId,
+            @RequestParam String contractName) {
+        return ResponseEntity.ok(contractService.checkContractExists(projectId, contractName));
     }
 }

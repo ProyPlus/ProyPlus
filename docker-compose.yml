@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   gestor-usuarios:
     build:
@@ -10,14 +8,14 @@ services:
     env_file:
       - .env
     environment:
-      SPRING_PROFILES_ACTIVE: prod
-      SWAGGER_UI_ENABLED: "true"  # habilita o no el swagger
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      SWAGGER_UI_ENABLED: ${SWAGGER_UI_ENABLED:-true}
     ports:
-      - "8080:8080"
+      - "${API_PORT:-8080}:8080"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped
- 
+
   web-angular:
     build:
       context: ./front
@@ -26,6 +24,11 @@ services:
     container_name: web-angular
     depends_on:
       - gestor-usuarios
+    env_file:
+      - .env
+    # 👇 publica 4200 para que el proxy externo llegue
     ports:
-      - "4200:4200"             
+      - "${WEB_PORT:-4200}:4200"
+    # (opcional) si corrés dev server, asegurate de escuchar en 0.0.0.0
+    # command: sh -c "ng serve --host 0.0.0.0 --port 4200"
     restart: unless-stopped

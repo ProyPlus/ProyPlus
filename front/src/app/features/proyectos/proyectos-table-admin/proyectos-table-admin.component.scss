@@ -1,0 +1,7 @@
+:host { display: block; padding: 1rem; }
+.pp-table { margin-top: 0.5rem; }
+
+.id-col { text-align: right; width: 80px; }
+
+/* pequeño ajuste visual para tags */
+:host ::ng-deep .p-tag { font-weight: 700; border-radius: 8px; }

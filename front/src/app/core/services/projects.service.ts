@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, map, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 
 export type ProjectStatus = 'PENDING_FUNDING' | 'IN_PROGRESS' | 'COMPLETED';
@@ -22,13 +23,17 @@ id: number;
 title: string;
 summary?: string | null;
 category?: string | null;
-status?: 'IDEA' | 'IN_PROGRESS' | 'MVP' | 'FUNDING' | 'COMPLETED' | string;
+status?: 'CANCELLED' | 'IN_PROGRESS' | 'PENDING_FUNDING' | 'NOT_FUNDED' | 'COMPLETED' | string;
 university?: string | null;
 owner?: string | null;
 tags?: string[] | null;
 lastUpdated?: string | null;
 fundingGoal?: number | null;
 fundingRaised?: number | null;
+startDate?: string | null;
+estimatedEndDate?: string | null;
+endDate?: string | null;
+deleted?: boolean | null;
 }
 
 
@@ -42,6 +47,9 @@ status: string;
 startDate: string;
 estimatedEndDate: string;
 endDate: string | null;
+tagName: string | null;
+ownerName: string | null;
+deleted: boolean;
 }
 
 
@@ -51,13 +59,17 @@ id: p.id,
 title: p.name,
 summary: p.description,
 status: p.status,
+startDate: p.startDate ?? null,
+estimatedEndDate: p.estimatedEndDate ?? null,
+endDate: p.endDate ?? null,
 fundingGoal: p.budgetGoal,
 fundingRaised: p.currentGoal,
 lastUpdated: p.startDate || null,
-category: '—',
+category: p.tagName ?? '—', // Mapear desde tagName
 university: null,
-owner: null,
+owner: p.ownerName || null,
 tags: null,
+deleted: p.deleted,
 };
 }
 
@@ -75,6 +87,19 @@ return this.http.get<ProjectApi[]>(this.api).pipe(map(list => (list ?? []).map(a
 getAllByTag(tag: string): Observable<IProject[]> {
     const url = `/api/projects/tag/${encodeURIComponent(tag)}`;
     return this.http.get<ProjectApi[]>(url).pipe(map(list => (list ?? []).map(adapt)));
+}
+
+getAllAdmin(): Observable<IProject[]> {
+  return this.http.get<ProjectApi[]>(`${this.api}/dashboard-admin/projects`).pipe(map(list => (list ?? []).map(adapt)));
+}
+
+getById(id: number): Observable<IProject | null> {
+    return this.http.get<ProjectApi>(`${this.api}/${id}`)
+      .pipe(
+        map(p => p ? adapt(p) : null),
+        // si falla, retornamos null para que el componente lo maneje
+        catchError((err) => { console.error('ProjectsService.getById', err); return of(null); })
+      );
 }
 
 

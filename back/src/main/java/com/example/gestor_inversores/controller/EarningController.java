@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping("/api/earnings")
 @RequiredArgsConstructor
 @Validated
-public class EarningController {
+public class    EarningController {
 
     private final IEarningService earningService;
 
@@ -72,5 +72,16 @@ public class EarningController {
     @GetMapping("/summary")
     public ResponseEntity<EarningsSummaryDTO> getEarningsSummary() {
         return ResponseEntity.ok(earningService.getEarningsSummary());
+    }
+
+    // --- NUEVOS ENDPOINTS SOLICITADOS ---
+    @GetMapping("/by-project/{projectId}")
+    public ResponseEntity<List<ResponseEarningDTO>> getByProjectId(@PathVariable Long projectId) {
+        return ResponseEntity.ok(earningService.getByProjectId(projectId));
+    }
+
+    @GetMapping("/by-contract/{contractId}")
+    public ResponseEntity<List<ResponseEarningDTO>> getByContractId(@PathVariable Long contractId) {
+        return ResponseEntity.ok(earningService.getByContractId(contractId));
     }
 }

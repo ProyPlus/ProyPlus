@@ -4,6 +4,7 @@ import com.example.gestor_inversores.dto.RequestInvestorDTO;
 import com.example.gestor_inversores.dto.RequestInvestorUpdateByAdminDTO;
 import com.example.gestor_inversores.dto.RequestInvestorUpdateDTO;
 import com.example.gestor_inversores.dto.ResponseInvestorDTO;
+import com.example.gestor_inversores.repository.IInvestorRepository;
 import com.example.gestor_inversores.service.investor.IInvestorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.List;
 public class InvestorController {
 
     private final IInvestorService investorService;
+    private final IInvestorRepository investorRepository;
 
     @GetMapping
     public ResponseEntity<List<ResponseInvestorDTO>> getAllInvestors() {
@@ -60,6 +62,12 @@ public class InvestorController {
     @PatchMapping("/desactivate/{id}")
     public ResponseEntity<ResponseInvestorDTO> desactivateInvestor(@PathVariable Long id) {
         return ResponseEntity.ok(investorService.desactivateInvestor(id));
+    }
+
+    // ✅ Endpoint para validar si el cuit ya existe
+    @GetMapping("/check-cuit/{cuit}")
+    public ResponseEntity<Boolean> checkCuitExists(@PathVariable String cuit) {
+        return ResponseEntity.ok(investorRepository.findByCuit(cuit).isPresent());
     }
 
 }

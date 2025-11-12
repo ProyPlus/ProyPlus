@@ -35,6 +35,9 @@ public class Investor extends User {
     @Size(max = 100, message = "El sitio web no puede superar 100 caracteres")
     private String webSite;
 
+    @Pattern(regexp = "^(https?://.*|linkedin\\.com/.*)?$", message = "Si se proporciona, debe ser una URL válida")
+    private String linkedinUrl;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id",referencedColumnName = "idAddress")
     private Address address;

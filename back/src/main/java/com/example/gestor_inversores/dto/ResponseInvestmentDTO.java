@@ -25,8 +25,6 @@ public class ResponseInvestmentDTO {
     private Long generatedById;
     private Long projectId;
     private Long confirmedByStudentId;
-
-
-
+    private int remainingRetries;
 
 }

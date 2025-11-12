@@ -3,9 +3,11 @@ package com.example.gestor_inversores.service.student;
 import com.example.gestor_inversores.dto.*;
 import com.example.gestor_inversores.exception.*;
 import com.example.gestor_inversores.mapper.StudentMapper;
+import com.example.gestor_inversores.model.Contract;
 import com.example.gestor_inversores.model.Project;
 import com.example.gestor_inversores.model.Role;
 import com.example.gestor_inversores.model.Student;
+import com.example.gestor_inversores.repository.IContractRepository;
 import com.example.gestor_inversores.repository.IProjectRepository;
 import com.example.gestor_inversores.repository.IStudentRepository;
 import com.example.gestor_inversores.repository.IUserRepository;
@@ -30,7 +32,8 @@ public class StudentService implements IStudentService {
     private final IStudentRepository studentRepository;
     private final IUserRepository userRepository;
     private final IProjectRepository projectRepository;
-    private final IRoleService roleService; // Cambiado a la interfaz para desacoplar
+    private final IContractRepository contractRepository;
+    private final IRoleService roleService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final StudentMapper mapper;
 
@@ -137,6 +140,27 @@ public class StudentService implements IStudentService {
     public Student desactivateStudent(Long id) {
         Student student = studentRepository.findById(id)
                 .orElseThrow(() -> new StudentNotFoundException("Estudiante con id " + id + " no existe"));
+
+        String errorMessage = "El estudiante tiene proyectos o contratos activos y no puede ser eliminado.";
+
+        // ✅ Validación: Comprobar si el estudiante tiene proyectos activos como propietario
+        List<Project> ownedProjects = projectRepository.findByOwnerIdAndDeletedFalse(id);
+        if (!ownedProjects.isEmpty()) {
+            throw new StudentDesactivationException(errorMessage);
+        }
+
+        // ✅ Validación: Comprobar si el estudiante participa en proyectos activos
+        List<Project> participatingProjects = projectRepository.findByStudents_IdAndDeletedFalse(id);
+        if (!participatingProjects.isEmpty()) {
+            throw new StudentDesactivationException(errorMessage);
+        }
+
+        // ✅ Validación: Comprobar si el estudiante (como dueño de proyecto) tiene contratos
+        List<Contract> contracts = contractRepository.findByProjectOwnerId(id);
+        if (!contracts.isEmpty()) {
+            throw new StudentDesactivationException(errorMessage);
+        }
+
         student.setEnabled(false);
 
         try {

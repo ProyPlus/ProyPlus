@@ -1,5 +1,6 @@
 // src/app/features/proyectos/proyectos.component.ts
 import { Component, OnInit, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AutoCompleteModule } from 'primeng/autocomplete';
@@ -42,6 +43,7 @@ export class ProyectosComponent implements OnInit {
   private studentSrv = inject(StudentService);
   private msg = inject(MessageService);
   private authSvc = inject(AuthService);
+  private router = inject(Router);
 
   projectForm!: FormGroup;
 
@@ -298,11 +300,8 @@ export class ProyectosComponent implements OnInit {
           life: 3500,
         });
 
-        setTimeout(() => {
-          this.isLoading = false;
-          this.projectForm.reset();
-          this.suggestionsStudents = [];
-        }, 300);
+        // Redirigir a la lista de proyectos del usuario
+        this.router.navigate(['/misproyectos']);
       },
       error: (err: unknown) => {
         clearInterval(prog);

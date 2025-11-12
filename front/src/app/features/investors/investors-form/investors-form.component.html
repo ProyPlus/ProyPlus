@@ -20,8 +20,7 @@
               <i class="pi pi-info-circle cursor-pointer" pTooltip="Elige un nombre de usuario único para identificarte en la plataforma."></i>
             </label>
             <input id="username" type="text" pInputText formControlName="username" class="w-full mt-1" autocomplete="off" />
-            <small *ngIf="getFieldError('username')" class="p-error">{{ getFieldError('username') }}</small>
-            <small *ngIf="usernameError()" class="p-error">{{ usernameError() }}</small>
+            <small *ngIf="isInvalidField('username') || form.get('username')?.pending" class="p-error">{{ form.get('username')?.pending ? 'Comprobando disponibilidad...' : getFieldError('username') }}</small>
           </div>
 
           <div class="field">
@@ -39,8 +38,7 @@
               <i class="pi pi-info-circle cursor-pointer" pTooltip="Usaremos este email para enviarte notificaciones importantes sobre tus inversiones y contratos."></i>
             </label>
             <input id="email" type="email" pInputText formControlName="email" class="w-full mt-1" />
-            <small *ngIf="getFieldError('email')" class="p-error">{{ getFieldError('email') }}</small>
-            <small *ngIf="emailError()" class="p-error">{{ emailError() }}</small>
+            <small *ngIf="isInvalidField('email') || form.get('email')?.pending" class="p-error">{{ form.get('email')?.pending ? 'Comprobando disponibilidad...' : getFieldError('email') }}</small>
           </div>
 
           <div class="field">
@@ -49,8 +47,7 @@
               <i class="pi pi-info-circle cursor-pointer" pTooltip="Tu Clave Única de Identificación Tributaria (11 dígitos, sin guiones)."></i>
             </label>
             <input id="cuit" type="text" pInputText formControlName="cuit" class="w-full mt-1" />
-            <small *ngIf="getFieldError('cuit')" class="p-error">{{ getFieldError('cuit') }}</small>
-            <small *ngIf="cuitError()" class="p-error">{{ cuitError() }}</small>
+            <small *ngIf="isInvalidField('cuit') || form.get('cuit')?.pending" class="p-error">{{ form.get('cuit')?.pending ? 'Comprobando CUIT...' : getFieldError('cuit') }}</small>
           </div>
 
           <!-- Sección de Contacto -->
@@ -136,10 +133,13 @@
           </div>
 
           <div class="field md:col-span-2">
-            <label for="province" class="font-medium">Provincia <span class="text-red-500">*</span></label>
+            <label for="province" class="font-medium flex items-center gap-2">
+              <span>Provincia <span class="text-red-500">*</span></span>
+              <i class="pi pi-info-circle cursor-pointer" pTooltip="La provincia de tu domicilio fiscal."></i>
+            </label>
             <select id="province" formControlName="province" class="w-full p-inputtext p-component mt-1">
               <option value="" disabled>Selecciona una provincia</option>
-              <option *ngFor="let prov of provinces" [value]="prov">{{ prov }}</option>
+              <option *ngFor="let prov of provinces" [value]="prov.value">{{ prov.label }}</option>
             </select>
             <small *ngIf="getFieldError('province')" class="p-error">{{ getFieldError('province') }}</small>
           </div>

@@ -8,6 +8,7 @@ import { roleGuard } from './features/auth/login/role.guard';
 import { studentOnlyGuard } from './features/auth/guards/student-only.guard'; // ⬅️ NUEVO
 
 export const routes: Routes = [
+  { path: 'index', loadComponent: () => import('./features/landing-page/landing.component').then(m => m.LandingComponent) },
   { path: 'auth/login',    loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent) },
   { path: 'auth/forgot',   loadComponent: () => import('./features/auth/forgot/forgot.component').then(m => m.ForgotComponent) },
   { path: 'auth/register', loadComponent: () => import('./features/auth/register/register.component').then(m => m.RegisterComponent) },
@@ -16,7 +17,7 @@ export const routes: Routes = [
   { path: 'auth/reset-password', loadComponent: () => import('./features/auth/reset/reset-password.component').then(c => c.ResetPasswordComponent) },
 
   {
-    path: '',
+    path: '', // Las rutas hijas ahora están en el nivel raíz, pero protegidas por el guard
     canActivate: [authGuard],
     loadComponent: () => import('./layout/shell.component').then(m => m.ShellComponent),
     children: [
@@ -26,7 +27,7 @@ export const routes: Routes = [
       { path: 'roles',            loadComponent: () => import('./features/roles/roles.component').then(m => m.RolesComponent) },
       //{ path: 'configuracion',    loadComponent: () => import('./features/config/configuracion.component').then(m => m.ConfiguracionComponent) },
       { path: 'estudiante-perfil', canActivate: [authGuard, roleGuard('ROLE_STUDENT')], loadComponent: () => import('./features/students/students-update-form/students-update-form.component').then(m => m.StudentsUpdateComponent)},
-      { path: 'inversor-perfil',canActivate: [authGuard, roleGuard('ROLE_INVESTOR')],loadComponent: () => import('./features/investors/investors-update-form/investors-update-form.component').then(m => m.InvestorsUpdateComponent)},
+      { path: 'inversor-perfil',canActivate: [authGuard, roleGuard('ROLE_INVESTOR')],loadComponent: () => import('./features/investors/investors-update-form/investors-update-form.component').then(m => m.InvestorsUpdateFormComponent)},
       { path: 'proyectos',        loadComponent: () => import('./features/proyectos/crear-proyectos.component').then(m => m.ProyectosComponent) },
       { path: 'marquesinas',   loadComponent: () => import('./features/mismarquesinas/mismarquesinas.component').then(m => m.MismarquesinasComponent) },
       { path: 'noticias',         loadComponent: () => import('./features/noticias/noticias.component').then(m => m.NoticiasComponent) },
@@ -36,6 +37,8 @@ export const routes: Routes = [
       { path: 'mi-perfil',        loadComponent: () => import('./features/profile/profile.component').then(m => m.ProfileComponent) },
       { path: 'marquesinas/tag/:tag',        loadComponent: () => import('./features/proyectos/mismarquesinas-projects-panel/mismarquesinas-projects-panel.component').then(m => m.MismarquesinasProjectsPanelComponent) },
       { path: 'mis-proyectos-invertidos',        loadComponent: () => import('./features/proyectos/proyectos-invertidos/proyectos-invertidos.component').then(m => m.ProyectosInvertidosComponent) },
+      { path: 'proyectos-gestion',        loadComponent: () => import('./features/proyectos/proyectos-table-admin/proyectos-table-admin.component').then(m => m.ProyectosTableAdminComponent) },
+      { path: 'proyectos-gestion-form/:id',        loadComponent: () => import('./features/gestion-proyectos-form/gestion-proyectos-form.component').then(m => m.GestionProyectosFormComponent) },
 
       // ✅ NUEVA RUTA PARA EL ANÁLISIS DE RIESGO
       {
@@ -93,5 +96,5 @@ export const routes: Routes = [
     ],
   },
 
-  { path: '**', redirectTo: 'auth/login' },
+  { path: '**', redirectTo: 'index' }, // Redirige a la landing page si la ruta no existe
 ];

@@ -143,6 +143,8 @@ public class StudentMapper {
         if (dto.getDni() != null) student.setDni(dto.getDni());
         if (dto.getPhone() != null) student.setPhone(dto.getPhone());
         if (dto.getDateOfBirth() != null) student.setDateOfBirth(dto.getDateOfBirth());
+        if (dto.getUniversity() != null) student.setUniversity(dto.getUniversity());
+        if (dto.getDegreeStatus() != null) student.setDegreeStatus(dto.getDegreeStatus());
         if (dto.getCareer() != null) student.setCareer(dto.getCareer());
         if (dto.getLinkedinUrl() != null) student.setLinkedinUrl(dto.getLinkedinUrl());
         if (dto.getDescription() != null) student.setDescription(dto.getDescription());

@@ -1,84 +1,174 @@
 <p-toast></p-toast>
 
-<p-toolbar class="mb-3">
-  <div class="p-toolbar-group-left">
-    <button pButton icon="pi pi-arrow-left" label="Volver a Mis Inversiones" (click)="goBack()"></button>
+<div class="investment-detail-page">
+  <div class="header">
+    <p-button icon="pi pi-arrow-left" [text]="true" [rounded]="true" (click)="goBack()" pTooltip="Volver" tooltipPosition="right"></p-button>
+    <h1>Detalle de la Inversión</h1>
   </div>
-</p-toolbar>
 
-<div *ngIf="loading()" class="flex items-center justify-center p-8">
-  <i class="pi pi-spin pi-spinner text-3xl"></i>
-</div>
+  @if (loading()) {
+    <div class="card-skeleton">
+      <div class="p-skeleton" style="width: 100%; height: 250px;"></div>
+    </div>
+  } @else if (investment(); as inv) {
+    <div class="content-grid">
+      <!-- Columna Izquierda: Detalles del Proyecto -->
+      <p-card class="project-card">
+        <ng-template pTemplate="header">
+          <div class="card-header">
+            <h2 class="project-title">{{ inv.project.title }}</h2>
+            <p-tag [value]="inv.project.category" severity="info"></p-tag>
+          </div>
+        </ng-template>
 
-<ng-container *ngIf="investment() as inv">
-  <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
-    <!-- Columna de Inversión -->
-    <div class="lg:col-span-1">
-      <p-card header="Detalle de mi Inversión" styleClass="h-full">
-        <div class="space-y-4 text-sm">
-          <div>
-            <div class="font-semibold text-gray-500 dark:text-gray-400">Monto Invertido</div>
-            <div class="text-2xl font-bold text-primary-500">
-              {{ inv.amount | number:'1.0-2' }} <span class="text-xl">{{ inv.currency }}</span>
+        <div class="project-summary" [innerHTML]="inv.project.summary | safeHtml"></div>
+
+        <div class="project-stats">
+          <div class="stat-item">
+            <span class="label">Tu Inversión:</span>
+            <span class="value amount">{{ inv.amount | currency:inv.currency:'symbol':'1.2-2' }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="label">Estado de la Inversión:</span>
+            <span class="value">
+              <p-tag [value]="getInvestmentStatusLabel(inv.status)" [severity]="getInvestmentStatusSeverity(inv.status)"></p-tag>
+            </span>
+          </div>
+          <div class="stat-item">
+            <span class="label">Fecha de Inversión:</span>
+            <span class="value">{{ inv.createdAt | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="label">Monto Recaudado:</span>
+            <span class="value amount">{{ inv.project.fundingRaised | currency:'USD':'symbol':'1.2-2' }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="label">Meta de Financiación:</span>
+            <span class="value">{{ inv.project.fundingGoal | currency:'USD':'symbol':'1.2-2' }}</span>
+          </div>
+        </div>
+
+        <div class="funding-progress">
+          <span class="label">Progreso de Financiación ({{ fundingPercentage() | number:'1.0-2' }}%)</span>
+          <!-- Barra de progreso personalizada para sobrefinanciación -->
+          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mt-1 flex"
+               [pTooltip]="overfundingProgress() > 0 ? '¡Meta superada! La barra verde representa el 100% del objetivo y la azul el excedente recaudado.' : ''"
+               tooltipPosition="top">
+            <div class="h-2.5 rounded-l-full"
+                 [ngClass]="{ 'bg-green-500': fundingProgress() >= 70, 'bg-yellow-400': fundingProgress() < 70, 'rounded-r-full': overfundingProgress() <= 0 }"
+                 [style.width.%]="fundingProgress()"></div>
+            <!-- Barra de sobrefinanciación -->
+            <div *ngIf="overfundingProgress() > 0" class="h-2.5 bg-blue-500 rounded-r-full" [style.width.%]="overfundingProgress()"></div>
+          </div>
+        </div>
+
+        <ng-template pTemplate="footer">
+          <p-button label="Ver Proyecto Completo" icon="pi pi-arrow-right" iconPos="right" styleClass="p-button-link" [routerLink]="['/proyectos-maestro', inv.project.id]"></p-button>
+        </ng-template>
+      </p-card>
+
+      <!-- Columna Derecha: Ganancias -->
+      <div class="earnings-section">
+        <p-card>
+          <ng-template pTemplate="title">
+            <div class="flex align-items-center gap-2">
+              <i class="pi pi-chart-line"></i>
+              <span>Monitor de Ganancias</span>
             </div>
-          </div>
-          <div>
-            <div class="font-semibold text-gray-500 dark:text-gray-400">Estado de la Inversión</div>
-            <div><p-tag [value]="getInvestmentStatusLabel(inv.status)" [ngStyle]="tagStyle(inv.status || '', 1)"></p-tag></div>
-          </div>
-          <div>
-            <div class="font-semibold text-gray-500 dark:text-gray-400">Fecha de Inversión</div>
-            <div class="text-gray-800 dark:text-gray-100">{{ inv.createdAt | date:'dd/MM/yyyy' }}</div>
-          </div>
-          <div *ngIf="inv.confirmedAt">
-            <div class="font-semibold text-gray-500 dark:text-gray-400">Fecha de Confirmación</div>
-            <div class="text-gray-800 dark:text-gray-100">{{ inv.confirmedAt | date:'dd/MM/yyyy' }}</div>
-          </div>
-        </div>
-      </p-card>
-    </div>
+          </ng-template>
 
-    <!-- Columna de Proyecto -->
-    <div class="lg:col-span-2">
-      <p-card header="Información del Proyecto Invertido" styleClass="h-full">
-        <h3 class="text-xl font-bold">{{ inv.project.title }}</h3>
-        <p class="mt-2 text-gray-600 dark:text-gray-300">{{ inv.project.summary }}</p>
-        <button pButton label="Ver Detalles Completos del Proyecto" icon="pi pi-arrow-right" class="p-button-text mt-4" (click)="goToProject()"></button>
-      </p-card>
-    </div>
-  </div>
-
-  <!-- Nueva Sección: Proyección de Ganancias -->
-  <div class="mt-4">
-    <p-card>
-      <div class="text-center mb-4">
-        <h3 class="text-xl font-semibold">Proyección de Ganancias</h3>
+          @if (inv.earnings && inv.earnings.length > 0) {
+            <p-table [value]="inv.earnings" styleClass="p-datatable-sm w-full">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Fecha de Generación</th>
+                  <th class="text-right">Inversión Base</th>
+                  <th class="text-right">Tasa de Ganancia</th>
+                  <th class="text-right">Monto Ganancia</th>
+                  <th>Estado</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-earning>
+                <tr>
+                  <td>{{ earning.createdAt | date:'dd/MM/yyyy' }}</td>
+                  <td class="text-right">{{ earning.baseAmount | currency:earning.currency:'symbol':'1.2-2' }}</td>
+                  <td class="text-right">{{ earning.profitRate | percent:'1.2-2' }}</td>
+                  <td class="text-right font-semibold">{{ earning.profitAmount | currency:earning.currency:'symbol':'1.2-2' }}</td>
+                  <td>
+                    <p-tag [value]="getEarningStatusLabel(earning.status)" [severity]="getEarningStatusSeverity(earning.status)"></p-tag>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          } @else {
+            <div class="empty-state">
+              <!-- Mensaje específico si la inversión fue devuelta o cancelada -->
+              @if (inv.status === 'RETURNED' || inv.status === 'CANCELLED' || inv.status === 'NOT_RECEIVED') {
+                <i class="pi pi-undo text-blue-500"></i>
+                <p>No se generaron ganancias</p>
+                <span>Esta inversión fue devuelta o cancelada, por lo que el ciclo finalizó sin generar beneficios.</span>
+              }
+              <!-- Mensaje genérico para otros casos -->
+              @else {
+                <i class="pi pi-info-circle"></i>
+                <p>Aún no se han generado ganancias para esta inversión.</p>
+                <span>Las ganancias se calcularán y mostrarán aquí una vez que el contrato asociado se cierre.</span>
+              }
+            </div>
+          }
+        </p-card>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-        <!-- Columna del Gráfico -->
-        <p-chart #chartCanvas type="line" [data]="chartData()" [options]="chartOptions()" class="w-full h-64"></p-chart>
-        <!-- Columna de Texto -->
-        <div class="space-y-4">
-          <div class="p-3 rounded-lg bg-gray-50 dark:bg-gray-700 flex justify-between items-center">
-            <span class="font-semibold">A 1 Año ({{ (inv.profit1Year ?? 0) * 100 | number:'1.0-2' }}%)</span>
-            <span class="text-lg text-green-500 font-bold">
-              +{{ calculateProfit(inv.amount, inv.profit1Year) | number:'1.0-2' }} {{ inv.currency }}
-            </span>
+    </div>
+
+    <!-- Sección de Proyección de Ganancias a Ancho Completo -->
+    <!-- CORRECCIÓN: Solo mostrar proyecciones si el estado de la inversión es apropiado (no cancelado, no devuelto, etc.) -->
+    @if (inv.status !== 'RETURNED' && inv.status !== 'CANCELLED' && inv.status !== 'NOT_RECEIVED' && inv.status !== 'PENDING_RETURN') {
+      @if (projectionChartData(); as chartData) {
+      <p-card class="mt-4">
+        <ng-template pTemplate="title">
+          <div class="flex align-items-center gap-2">
+            <i class="pi pi-chart-bar"></i>
+            <span>Proyección de Ganancias</span>
           </div>
-          <div class="p-3 rounded-lg bg-gray-50 dark:bg-gray-700 flex justify-between items-center">
-            <span class="font-semibold">A 2 Años ({{ (inv.profit2Years ?? 0) * 100 | number:'1.0-2' }}%)</span>
-            <span class="text-lg text-green-500 font-bold">
-              +{{ calculateProfit(inv.amount, inv.profit2Years) | number:'1.0-2' }} {{ inv.currency }}
-            </span>
+        </ng-template>
+
+        <div class="projection-grid">
+          <div class="chart-container">
+            <p-chart type="line" [data]="chartData" [options]="projectionChartOptions()"></p-chart>
           </div>
-          <div class="p-3 rounded-lg bg-gray-50 dark:bg-gray-700 flex justify-between items-center">
-            <span class="font-semibold">A 3 Años ({{ (inv.profit3Years ?? 0) * 100 | number:'1.0-2' }}%)</span>
-            <span class="text-lg text-green-500 font-bold">
-              +{{ calculateProfit(inv.amount, inv.profit3Years) | number:'1.0-2' }} {{ inv.currency }}
-            </span>
+          <div class="projection-list">
+            @for (ds of chartData.datasets; track ds) {
+              @for (item of ds.data; track $index) {
+                <div class="projection-item">
+                  <!-- CORRECCIÓN: La variable 'projections' no existe aquí. 
+                       Calculamos el porcentaje a partir del monto de la inversión y la ganancia proyectada. -->
+                  <span class="term">{{ chartData.labels[$index] }} ({{ (item / inv.amount * 100) | number:'1.0-0' }}%)</span>
+                  <span class="profit">+{{ item | currency:inv.currency:'':'1.2-2' }} {{ inv.currency }}</span>
+                </div>
+              }
+            }
           </div>
         </div>
+      </p-card>
+      } @else {
+        <p-card class="mt-4">
+          <div class="empty-state">
+            <i class="pi pi-info-circle"></i>
+            <p>No hay proyecciones de ganancias disponibles.</p>
+            <span>Las proyecciones se basan en los términos del contrato asociado al proyecto.</span>
+          </div>
+        </p-card>
+      }
+    }
+
+  } @else {
+    <p-card>
+      <div class="empty-state">
+        <i class="pi pi-exclamation-triangle"></i>
+        <p>No se encontró la inversión</p>
+        <span>La inversión que buscas no existe o fue eliminada.</span>
+        <p-button label="Volver a Mis Inversiones" styleClass="p-button-text mt-4" (click)="goBack()"></p-button>
       </div>
     </p-card>
-  </div>
-</ng-container>
+  }
+</div>

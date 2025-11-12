@@ -8,6 +8,7 @@ import com.example.gestor_inversores.utils.JwtUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -33,7 +34,7 @@ public class UserDetailsServiceImp implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         User userSec = userRepo.findUserEntityByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("El usuario " + username + "no fue encontrado"));
+                .orElseThrow(() -> new UsernameNotFoundException("El usuario " + username + " no fue encontrado"));
 
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
 
@@ -83,6 +84,11 @@ public class UserDetailsServiceImp implements UserDetailsService {
         if (userDetails == null) {
             throw new BadCredentialsException("Invalid username or password");
         }
+
+        if (!userDetails.isEnabled()) {
+            throw new DisabledException("La cuenta de usuario está desactivada.");
+        }
+
         if (!passwordEncoder.matches(password, userDetails.getPassword())) {
             throw new BadCredentialsException("Invalid username or password");
         }

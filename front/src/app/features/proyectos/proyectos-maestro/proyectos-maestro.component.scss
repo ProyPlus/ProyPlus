@@ -1,14 +1,7 @@
-:host {
-  display: block;
-}
-
-.p-card {
-  border-radius: 1rem;
-}
-
-/* Para que la animación de slide funcione correctamente,
-   el p-card dentro del div animado no debe tener margen superior. */
-::ng-deep .p-card-content {
-  padding-top: 0;
-  padding-bottom: 0;
+::ng-deep .contract-steps .p-steps-item .p-menuitem-link {
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }

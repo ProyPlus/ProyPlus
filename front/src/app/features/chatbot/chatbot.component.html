@@ -1,17 +1,29 @@
 <div *ngIf="shouldShowChatbot">
   <div class="chat-fab" (click)="toggleChat()" [class.open]="isChatOpen">
-    <!-- <img src="https://cdn-icons-png.flaticon.com/512/4712/4712027.png" alt="Abrir chat" class="chat-icon" *ngIf="!isChatOpen"> -->
-    <img src="/assets/images/chatbot-icon.PNG" alt="Abrir chat" class="chat-icon" *ngIf="!isChatOpen">
-    <span class="minimize-icon" *ngIf="isChatOpen">—</span>
+    <div class="icon-wrapper">
+      <img src="/assets/images/chatbot-icon.PNG" alt="Abrir chat" class="chat-icon" *ngIf="!isChatOpen">
+      <i class="pi pi-times close-icon" *ngIf="isChatOpen"></i>
+    </div>
   </div>
+  <!-- Globo de Ayuda Llamativo -->
+  <div class="help-bubble" *ngIf="showHelpBubble && !isChatOpen">
+    Si necesitas ayuda, ¡no dudes en consultarme!
+  </div>
+
   <div class="chat-window" [class.open]="isChatOpen">
     <div class="chat-header">
       <h3>Asistente Virtual</h3>
-      <button class="close-btn" (click)="toggleChat()">❌</button>
+      <button class="close-btn" (click)="toggleChat()"><i class="pi pi-times"></i></button>
     </div>
     <div class="chat-body">
       <div *ngFor="let message of messages" class="message" [ngClass]="message.type">
         <div [innerHTML]="toHtml(message.text)"></div>
+      </div>
+      <!-- Indicador de "Escribiendo..." -->
+      <div *ngIf="isBotTyping" class="message received typing-indicator">
+        <span></span>
+        <span></span>
+        <span></span>
       </div>
       <div class="preset-questions">
         <button class="preset-btn" (click)="selectQuestion('Crear proyecto')">Crear proyecto</button>

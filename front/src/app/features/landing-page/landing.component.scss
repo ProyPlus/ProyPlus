@@ -1,0 +1,150 @@
+.landing-header {
+  background-color: rgba(255, 255, 255, 0.8);
+  // Efecto de desenfoque para un look moderno
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  transition: background-color 0.3s ease;
+}
+.dark .landing-header {
+  background-color: rgba(17, 24, 39, 0.8); /* bg-gray-900 con opacidad */
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.hero-section {
+  // Aumentamos el padding para más "aire"
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+
+  .hero-bg {
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(var(--primary-300), 0.15), transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(var(--primary-400), 0.1), transparent 50%),
+      linear-gradient(180deg, rgba(255,255,255,0) 80%, var(--p-content-background));
+  }
+  .dark .hero-bg {
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(var(--primary-300), 0.1), transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(var(--primary-400), 0.05), transparent 50%),
+      linear-gradient(180deg, rgba(0,0,0,0) 80%, var(--p-content-background));
+  }
+
+  h1 {
+    // Título más grande y con gradiente de color primario
+    font-size: 4.5rem; // Un poco más grande para más impacto
+    color: var(--primary-color); // Usamos el color primario directamente para asegurar visibilidad
+  }
+
+  .hero-logo-image {
+    // Logo más grande y con animación sutil
+    max-width: 350px;
+    width: 100%;
+    margin: auto;
+    display: block;
+    animation: logo-float 6s ease-in-out infinite;
+  }
+}
+.stats-section {
+  // Fondo contrastante y borde sutil
+  background-color: var(--surface-ground);
+  border-top: 1px solid var(--surface-border);
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.value-prop-section .p-card {
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(var(--primary-500), 0.1);
+  }
+}
+
+.carousel-section {
+  background-color: var(--surface-section);
+}
+
+.how-it-works-section {
+  background-color: var(--surface-ground);
+
+  .step-icon {
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    // Íconos con el color primario para consistencia
+    i {
+      color: var(--primary-color);
+    }
+  }
+  .step:hover .step-icon {
+    transform: scale(1.1);
+    // Efecto de hover más notorio
+    background-color: rgba(var(--primary-500), 0.2);
+  }
+}
+
+.final-cta-section {
+  background: radial-gradient(circle, var(--gray-100) 0%, var(--gray-50) 100%);
+}
+.dark .final-cta-section {
+  background: radial-gradient(circle, var(--gray-800) 0%, var(--gray-900) 100%);
+}
+
+.security-section {
+  // Fondo claro para la sección de seguridad
+  .security-image {
+    max-width: 200px;
+    width: 100%;
+    margin: auto;
+    animation: shield-pulse 4s ease-in-out infinite alternate;
+  }
+}
+
+// Estilos generales para los títulos de sección
+h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+// Estilos para el pie de página, con fondo oscuro como pide el prompt
+.landing-footer {
+  background-color: var(--gray-800);
+}
+
+@keyframes shield-pulse {
+  from {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  to {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+@keyframes logo-float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
+}
+
+.carousel-section {
+  // Optimización de rendimiento: le decimos al navegador que el contenido de esta sección
+  // es independiente del resto, evitando parpadeos al hacer scroll.
+  contain: paint;
+  .p-carousel .p-carousel-indicators .p-carousel-indicator.p-highlight button {
+    background-color: var(--primary-500);
+  }
+  .p-carousel .p-carousel-indicators .p-carousel-indicator button {
+    background-color: var(--gray-300);
+  }
+  .dark .p-carousel .p-carousel-indicators .p-carousel-indicator button {
+    background-color: var(--gray-700);
+  }
+
+  .carousel-item-content {
+    padding: 0 1rem;
+    img {
+      max-height: 500px;
+      object-fit: cover;
+      margin: auto;
+    }
+  }
+}

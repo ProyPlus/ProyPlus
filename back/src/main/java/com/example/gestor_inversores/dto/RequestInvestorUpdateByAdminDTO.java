@@ -4,6 +4,7 @@ import com.example.gestor_inversores.model.Address;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,6 +36,9 @@ public class RequestInvestorUpdateByAdminDTO {
 
     @Size(max = 100, message = "El sitio web no puede superar 100 caracteres")
     private String webSite;
+
+    @Pattern(regexp = "^(https?://.*|linkedin\\.com/.*)?$", message = "Si se proporciona, debe ser una URL válida")
+    private String linkedinUrl;
 
     @Valid
     private Address address;

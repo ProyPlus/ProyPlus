@@ -3,6 +3,7 @@ import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { tap, map, Observable, catchError, throwError } from "rxjs";
 import { mapAuthError } from "../shared/auth-errors";
+import { AuthLoginRequest } from "../shared/auth.dto";
 
 /** ====== Tipos de API ====== */
 interface LoginResponse {
@@ -43,7 +44,13 @@ export class AuthService {
 
   /** POST login y persiste token + metadatos (incluye id) */
   login(username: string, password: string): Observable<Session> {
-    return this.http.post<LoginResponse>(LOGIN_PATH, { username, password }).pipe(
+    // FIX: Se crea un objeto explícito que coincide con el DTO del backend
+    // para evitar problemas de serialización donde los campos se concatenan.
+    const payload: AuthLoginRequest = {
+      username: username,
+      password: password,
+    };
+    return this.http.post<LoginResponse>(LOGIN_PATH, payload).pipe(
       map((res) => {
         if (!res?.status || !res?.jwt) throw new Error("Login inválido");
         return this.toSession(res);

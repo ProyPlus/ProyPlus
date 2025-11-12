@@ -1,8 +1,11 @@
 /* Estilos del Shell (sidebar + topbar) */
 :host {
+  display: block;
+  height: 100dvh;
   --topbar-h: 56px;
 
   /* 🎨 tokens del sidebar */
+  /* 🎨 Los tokens del sidebar ahora usan directamente las variables globales de styles.scss */
   --sidebar-bg: var(--surface-ground);
   --sidebar-item-bg: transparent;
   --sidebar-item-hover-bg: var(--surface-hover);
@@ -24,7 +27,7 @@
   top: 0;
   z-index: 10;
 
-  background: var(--surface-section);
+  background: var(--surface-card); /* Usar el color de fondo para tarjetas/secciones */
   border-bottom: 1px solid var(--surface-border);
 
   .left { display:flex; align-items:center; gap:.5rem; }
@@ -140,13 +143,6 @@
 }
 :host {
   --topbar-h: 56px;
-
-  /* 🔧 Fallbacks si el tema no montó variables */
-  --surface-ground: #f6f7f9;
-  --surface-section: #ffffff;
-  --surface-card: #ffffff;
-  --surface-border: #e5e7eb;
-  --text-color: #111827;
 
   /* 🎨 tokens del sidebar (derivan de las anteriores) */
   --sidebar-bg: var(--surface-ground);

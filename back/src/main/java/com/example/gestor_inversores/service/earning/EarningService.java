@@ -6,6 +6,7 @@ import com.example.gestor_inversores.exception.*;
 import com.example.gestor_inversores.mapper.EarningMapper;
 import com.example.gestor_inversores.model.*;
 import com.example.gestor_inversores.model.enums.EarningStatus;
+import com.example.gestor_inversores.repository.IContractRepository;
 import com.example.gestor_inversores.repository.IEarningRepository;
 import com.example.gestor_inversores.repository.IInvestorRepository;
 import com.example.gestor_inversores.repository.IProjectRepository;
@@ -29,12 +30,16 @@ import java.util.stream.Collectors;
 public class EarningService implements IEarningService {
 
     private final IEarningRepository earningRepository;
+    private final IContractRepository contractRepository; // Inyectado para validación
     private final EarningMapper earningMapper;
     private final IProjectRepository projectRepository;
     private final IStudentRepository studentRepository;
     private final IInvestorRepository investorRepository;
     private final MailService mailService;
 
+    private static final int MAX_RETRIES = 3;
+
+    @Override
     public ResponseEarningDTO createFromContract(Contract contract, Student generatedByStudent) {
         if (contract == null) throw new IllegalArgumentException("Contract cannot be null");
         Project project = contract.getProject();
@@ -124,22 +129,27 @@ public class EarningService implements IEarningService {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new StudentNotFoundException("Estudiante no encontrado"));
 
-        // Validar que el estudiante que envía el pago sea el dueño del proyecto que generó la ganancia
         if (!earning.getGeneratedBy().getId().equals(student.getId())) {
             throw new UnauthorizedOperationException("No tienes permiso para confirmar el envío de esta ganancia. Solo el estudiante dueño del proyecto puede hacerlo.");
         }
 
-        // Validar estado actual de la ganancia
-        if (earning.getStatus() != EarningStatus.IN_PROGRESS) {
-            throw new UpdateException("Esta ganancia no puede ser marcada como enviada en su estado actual. Se espera el estado 'IN_PROGRESS'. Estado actual: " + earning.getStatus());
+        if (earning.getStatus() != EarningStatus.IN_PROGRESS && earning.getStatus() != EarningStatus.NOT_RECEIVED) {
+            throw new UpdateException("La ganancia solo se puede marcar como enviada si su estado es 'IN_PROGRESS' o 'NOT_RECEIVED'. Estado actual: " + earning.getStatus());
+        }
+
+        if (earning.getRetryCount() >= MAX_RETRIES) {
+            throw new BusinessException("Se ha alcanzado el número máximo de reintentos para el envío de esta ganancia. Por favor, contacta a soporte.");
+        }
+
+        if (earning.getStatus() == EarningStatus.NOT_RECEIVED) {
+            earning.setRetryCount(earning.getRetryCount() + 1);
         }
 
         earning.setStatus(EarningStatus.PENDING_CONFIRMATION);
-        earning.setConfirmedAt(LocalDate.now()); // Usamos confirmedAt para registrar la fecha de esta acción
+        earning.setConfirmedAt(LocalDate.now());
 
         Earning savedEarning = earningRepository.save(earning);
 
-        // Notificar al inversor (dueño de la ganancia)
         Investor investor = savedEarning.getContract().getCreatedByInvestor();
         String toInvestor = investor.getEmail();
         String subject = String.format("¡Pago de ganancia enviado para tu proyecto '%s'!", savedEarning.getProject().getName());
@@ -172,33 +182,13 @@ public class EarningService implements IEarningService {
             throw new UnauthorizedOperationException("No tienes permiso para gestionar esta ganancia.");
         }
 
-        // Validar estado actual de la ganancia - Ahora debe ser PENDING_CONFIRMATION
-        if (earning.getStatus() != EarningStatus.PENDING_CONFIRMATION) {
-            throw new UpdateException("Esta ganancia no puede ser confirmada en su estado actual. Se espera el estado 'PENDING_CONFIRMATION'. Estado actual: " + earning.getStatus());
+        if (earning.getStatus() != EarningStatus.PENDING_CONFIRMATION && earning.getStatus() != EarningStatus.NOT_RECEIVED) {
+            throw new UpdateException("La ganancia solo se puede confirmar si su estado es 'PENDING_CONFIRMATION' o 'NOT_RECEIVED'. Estado actual: " + earning.getStatus());
         }
 
-        earning.setStatus(EarningStatus.RECEIVED); // Estado original
+        earning.setStatus(EarningStatus.RECEIVED);
         earning.setConfirmedBy(investor);
         earning.setConfirmedAt(LocalDate.now());
-
-        Project project = projectRepository.findById(earning.getProject().getIdProject())
-                .orElseThrow(() -> new BusinessException("La ganancia no está asociada a un proyecto válido"));
-
-        // Lógica para restar del currentGoal (si aplica, o si el dinero ya fue restado al generar la ganancia)
-        // Por ahora, asumo que el currentGoal se ajusta al pagar la ganancia base, no la ganancia total.
-        // Si la lógica de tu negocio es diferente, esto podría necesitar ajuste.
-        BigDecimal currentGoal = project.getCurrentGoal() != null ? project.getCurrentGoal() : BigDecimal.ZERO;
-        BigDecimal amountToSubtract = earning.getBaseAmount() != null ? earning.getBaseAmount() : BigDecimal.ZERO;
-
-        if (currentGoal.compareTo(amountToSubtract) < 0) {
-            // Esto podría indicar un problema si el currentGoal ya se usó para otras cosas
-            // O si la lógica es que el estudiante paga de su bolsillo.
-            // Por ahora, lanzamos una excepción para indicar que algo no cuadra.
-            throw new BusinessException("El proyecto no tiene fondos suficientes para cubrir la base de esta ganancia en el currentGoal.");
-        }
-
-        project.setCurrentGoal(currentGoal.subtract(amountToSubtract));
-        projectRepository.save(project);
 
         Earning savedEarning = earningRepository.save(earning);
 
@@ -232,12 +222,11 @@ public class EarningService implements IEarningService {
             throw new UnauthorizedOperationException("No tienes permiso para gestionar esta ganancia.");
         }
 
-        // Validar estado actual de la ganancia - Ahora debe ser PENDING_CONFIRMATION
         if (earning.getStatus() != EarningStatus.PENDING_CONFIRMATION) {
             throw new UpdateException("Esta ganancia no puede ser marcada como 'no recibida' en su estado actual. Se espera el estado 'PENDING_CONFIRMATION'. Estado actual: " + earning.getStatus());
         }
 
-        earning.setStatus(EarningStatus.NOT_RECEIVED); // Estado original
+        earning.setStatus(EarningStatus.NOT_RECEIVED);
         earning.setConfirmedBy(investor);
         earning.setConfirmedAt(LocalDate.now());
 
@@ -318,5 +307,27 @@ public class EarningService implements IEarningService {
                         Collectors.reducing(BigDecimal.ZERO, Earning::getAmount, BigDecimal::add)));
 
         return new EarningsSummaryDTO(totalEarnings, totalBaseAmount, totalProfitAmount, totalCount, totalEarningsByCurrency);
+    }
+
+    @Override
+    public List<ResponseEarningDTO> getByProjectId(Long projectId) {
+        if (!projectRepository.existsById(projectId)) {
+            throw new ProjectNotFoundException("Proyecto no encontrado con ID: " + projectId);
+        }
+        List<Earning> earnings = earningRepository.findByProject_IdProject(projectId);
+        return earnings.stream()
+                .map(earningMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ResponseEarningDTO> getByContractId(Long contractId) {
+        if (!contractRepository.existsById(contractId)) {
+            throw new ContractNotFoundException("Contrato no encontrado con ID: " + contractId);
+        }
+        List<Earning> earnings = earningRepository.findByContract_IdContract(contractId);
+        return earnings.stream()
+                .map(earningMapper::toResponse)
+                .collect(Collectors.toList());
     }
 }

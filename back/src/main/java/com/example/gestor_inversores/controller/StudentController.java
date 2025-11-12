@@ -3,9 +3,12 @@ package com.example.gestor_inversores.controller;
 import com.example.gestor_inversores.dto.*;
 import com.example.gestor_inversores.mapper.StudentMapper;
 import com.example.gestor_inversores.model.Student;
+import com.example.gestor_inversores.repository.IStudentRepository;
+import com.example.gestor_inversores.repository.IUserRepository;
 import com.example.gestor_inversores.service.student.IStudentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +21,8 @@ public class StudentController {
 
     private final IStudentService studentService;
     private final StudentMapper studentMapper;
+    private final IUserRepository userRepository;
+    private final IStudentRepository studentRepository;
 
     // GET ALL
     @GetMapping
@@ -93,5 +98,23 @@ public class StudentController {
         return studentService.findByUsername(username)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    // ✅ Endpoint para validar si el username ya existe
+    @GetMapping("/check-username/{username}")
+    public ResponseEntity<Boolean> checkUsernameExists(@PathVariable String username) {
+        return ResponseEntity.ok(userRepository.findUserEntityByUsername(username).isPresent());
+    }
+
+    // ✅ Endpoint para validar si el email ya existe
+    @GetMapping("/check-email/{email}")
+    public ResponseEntity<Boolean> checkEmailExists(@PathVariable String email) {
+        return ResponseEntity.ok(userRepository.findByEmail(email).isPresent());
+    }
+
+    // ✅ Endpoint para validar si el dni ya existe
+    @GetMapping("/check-dni/{dni}")
+    public ResponseEntity<Boolean> checkDniExists(@PathVariable String dni) {
+        return ResponseEntity.ok(studentRepository.findByDni(dni).isPresent());
     }
 }

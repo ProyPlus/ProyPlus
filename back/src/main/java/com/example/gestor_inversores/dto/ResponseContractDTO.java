@@ -18,7 +18,7 @@ public class ResponseContractDTO {
     private Long idContract;
     private Long projectId;
     private Long createdByInvestorId;
-    private Long investmentId;
+    private ResponseInvestmentDTO investment; // Cambiado de Long a InvestmentDTO
 
     private String textTitle;
 

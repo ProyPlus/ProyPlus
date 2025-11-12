@@ -15,6 +15,7 @@ export interface IMyProjectApi {
   endDate: string | null;
   ownerId?: number;
   ownerName?: string;
+  tagName?: string; // Añadido para la categoría
   students?: IMyProjectStudent[];
 }
 
@@ -42,7 +43,7 @@ function adapt(p: IMyProjectApi): IMyProject {
     fundingGoal: p.budgetGoal ?? null,
     fundingRaised: p.currentGoal ?? null,
     owner: p.ownerName ?? null,
-    category: '—',
+    category: p.tagName ?? null, // Mapear desde la API
     university: null,
     students: p.students ?? null,
   };

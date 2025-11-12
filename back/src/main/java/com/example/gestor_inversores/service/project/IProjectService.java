@@ -13,6 +13,7 @@ public interface IProjectService {
     ResponseProjectDTO update(Long id, RequestProjectUpdateDTO projectDTO);
     void delete(Long id);
     List<ResponseProjectDTO> getAllProjects(boolean active);
+    List<ResponseProjectDTO> getAllProjectsAdmin();
     List<ResponseProjectStudentDTO> getStudentsByProject(Long projectId);
     ResponseProjectDTO findById(Long id);
 

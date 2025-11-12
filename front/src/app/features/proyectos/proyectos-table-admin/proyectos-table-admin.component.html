@@ -1,0 +1,79 @@
+<p-toast></p-toast>
+
+<p-toolbar class="mb-3">
+  <div class="p-toolbar-group-left flex items-center">
+        
+    <button 
+      pButton 
+      label="Refrescar" 
+      icon="pi pi-refresh" 
+      (click)="reload()" 
+      [disabled]="loading">
+    </button>
+  </div>
+  
+  <div class="p-toolbar-group-right">
+    <span class="p-input-icon-left">
+      <i class="pi pi-search mr-2"></i>
+      <input pInputText type="text" placeholder="Buscar..." [(ngModel)]="q" (input)="applyFilter()" />
+    </span>
+
+    <select class="p-inputtext p-component mr-2" [(ngModel)]="statusFilter" (change)="applyFilter()">
+      <option value="">Todos los estados</option>
+      <option value="IN_PROGRESS">IN_PROGRESS</option>
+      <option value="PENDING_FUNDING">PENDING_FUNDING</option>
+      <option value="NOT_FUNDED">NOT_FUNDED</option>
+      <option value="COMPLETED">COMPLETED</option>
+      <option value="CANCELLED">CANCELLED</option>
+    </select>
+  </div>
+</p-toolbar>
+
+<p-card header="Listado de proyectos" class="pp-table">
+  <p-table [value]="filteredProjects" [loading]="loading" dataKey="id" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5,10,25]">
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width:80px">ID</th>
+        <th>Título</th>
+        <th>Categoría</th>
+        <th>Estado</th>
+        <th>Owner</th>
+        <th>Financiación</th>
+        <th style="width:160px;text-align:center">Acciones</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-row>
+      <tr>
+        <td class="text-right">{{ row.id }}</td>
+        <td>{{ row.title }}</td>
+        <td><p-tag [value]="row.category || '—'" [ngStyle]="tagStyle(row.category || '—')"></p-tag></td>
+        <td><p-tag [value]="row.status || '—'" [ngStyle]="tagStyle(row.status || '—')"></p-tag></td>
+        <td>{{ row.owner || '—' }}</td>
+        <td>{{ formatFunding(row) }}</td>
+        <td class="text-center whitespace-nowrap">
+          <button pButton type="button" pTooltip="Ver" icon="pi pi-eye" class="p-button-text" (click)="onView(row)"></button>
+          <button pButton type="button" pTooltip="Ir al proyecto" icon="pi pi-pencil" severity="success" class="p-button-text" (click)="goToProject(row)"></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-card>
+
+<p-dialog [(visible)]="showDetail" [modal]="true" [style]="{ width: '900px' }" [breakpoints]="{ '1200px':'80vw','960px':'90vw','640px':'95vw' }" [contentStyle]="{ 'max-height':'75vh','overflow':'auto' }" [maximizable]="true" [dismissableMask]="true" header="Detalle de proyecto" (onHide)="onDialogHide()">
+  <ng-container *ngIf="selected">
+    <div class="mb-4">
+      <div class="text-xl font-bold">{{ selected.title }}</div>
+      <div class="text-sm text-muted">{{ selected.category || '—' }} · {{ selected.owner || '—' }}</div>
+    </div>
+
+    <p-divider></p-divider>
+
+    <div class="grid grid-cols-1 gap-3 text-sm">
+      <div><strong>Resumen:</strong> {{ selected.summary || '—' }}</div>
+      <div><strong>Estado:</strong> {{ selected.status || '—' }}</div>
+      <div><strong>Última actualización:</strong> {{ selected.lastUpdated || '—' }}</div>
+      <div><strong>Financiación:</strong> {{ formatFunding(selected) }}</div>
+    </div>
+  </ng-container>
+</p-dialog>

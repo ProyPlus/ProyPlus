@@ -13,6 +13,7 @@ interface IParticipantProjectApi {
   startDate: string;
   estimatedEndDate: string;
   endDate: string | null;
+  tagName?: string; // Añadido para la categoría
 }
 
 function adapt(p: IParticipantProjectApi): IMyProject {
@@ -25,7 +26,7 @@ function adapt(p: IParticipantProjectApi): IMyProject {
     fundingGoal: p.budgetGoal ?? null,
     fundingRaised: p.currentGoal ?? null,
     owner: null,
-    category: '—',
+    category: p.tagName ?? null, // Mapear desde la API
     university: null,
     students: null,
   };

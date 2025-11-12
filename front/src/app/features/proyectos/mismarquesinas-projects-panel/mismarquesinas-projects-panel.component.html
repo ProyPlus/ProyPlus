@@ -4,7 +4,7 @@
   <div class="p-toolbar-group-left flex items-center gap-2">
     <button pButton icon="pi pi-arrow-left" (click)="goBack()" [text]="true" [rounded]="true" [size]="'small'"></button>
     <span class="p-input-icon-left">
-      <i class="pi pi-search"></i>
+      <i class="pi pi-search mr-2"></i>
       <input pInputText type="text" placeholder="Buscar proyectos..."
             [(ngModel)]="q" (input)="applyFilters()" />
     </span>
@@ -79,8 +79,8 @@
 
         <div class="opacity-70 text-sm mt-1 line-clamp-3">{{ p.summary || '—' }}</div>
         <div class="mt-2 flex gap-2 flex-wrap">
-          <p-tag [value]="p.category || '—'" [ngStyle]="tagStyle(p.category || '—', 0)"></p-tag>
-          <p-tag [value]="p.status || '—'"   [ngStyle]="tagStyle(p.status || '—', 1)"></p-tag>
+          <p-tag [value]="getCategoryLabel(p.category)" [ngStyle]="tagStyle(p.category || '—', 0)"></p-tag>
+          <p-tag [value]="getProjectStatusLabel(p.status)"   [ngStyle]="tagStyle(p.status || '—', 1)"></p-tag>
           <p-tag *ngIf="p.university" [value]="p.university" [ngStyle]="tagStyle(p.university, 2)"></p-tag>
           <p-tag *ngFor="let t of (p.tags || []); let i = index" [value]="t" [ngStyle]="tagStyle(t, i+3)"></p-tag>
         </div>
@@ -120,8 +120,8 @@
       <tr>
         <td class="text-right">{{ row.id }}</td>
         <td>{{ row.title }}</td>
-        <td><p-tag [value]="row.category || '—'" [ngStyle]="tagStyle(row.category || '—',0)"></p-tag></td>
-        <td><p-tag [value]="row.status || '—'" [ngStyle]="tagStyle(row.status || '—',1)"></p-tag></td>
+        <td><p-tag [value]="getCategoryLabel(row.category)" [ngStyle]="tagStyle(row.category || '—',0)"></p-tag></td>
+        <td><p-tag [value]="getProjectStatusLabel(row.status)" [ngStyle]="tagStyle(row.status || '—',1)"></p-tag></td>
         <td>{{ row.university || '—' }}</td>
         <td class="text-center whitespace-nowrap">
           <button pButton type="button" pTooltip="Ver" icon="pi pi-eye" [text]="true" [rounded]="true" [size]="'small'"

@@ -1,0 +1,75 @@
+:host {
+  display: block;
+  padding: 1rem;
+}
+
+// 1. Aseguramos el espaciado vertical
+.p-fluid .field {
+  margin-bottom: 1rem;
+}
+
+// 2. FORZAR ANCHO DEL 100% PARA INPUTS Y SELECTS DE PRIMENG
+// Esto garantiza que si p-fluid o PrimeFlex fallan, el input igual llenará su 'col-x'
+.p-inputtext,
+input[pInputText],
+textarea[pInputTextarea],
+select.p-inputtext {
+  width: 100% !important; 
+  box-sizing: border-box; // Importante para que el padding no desborde
+}
+
+// 3. Ajuste para el select nativo con estilo PrimeNG
+select.p-inputtext {
+    height: var(--input-height, 2.5rem); 
+    padding: 0.5rem; // Padding uniforme
+}
+
+// (Mantenemos los estilos de tablas y pestañas)
+// --- Estilos para Pestañas (Tabs) ---
+.tab-button {
+  position: relative;
+  transition: all 0.2s;
+
+  &.tab-active {
+    font-weight: bold;
+    color: var(--primary-color, #4f46e5);
+    border-bottom: 3px solid var(--primary-color, #4f46e5);
+    margin-bottom: -2px;
+  }
+}
+
+// --- Estilos para Tablas ---
+.p-datatable-table {
+  width: 100%;
+  border-collapse: collapse;
+  
+  thead th {
+    font-weight: 600;
+    color: var(--text-color-secondary, #6b7280);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    padding: 0.75rem 1rem; // Padding consistente en headers
+  }
+
+  tbody tr.border-b {
+      border-bottom: 1px solid var(--surface-d, #e5e7eb);
+      &:last-child {
+        border-bottom: none;
+      }
+  }
+
+  td {
+      padding: 0.5rem 1rem; // Padding consistente en celdas
+  }
+}
+
+// --- Estilos para Status Tags ---
+.status-tag {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: var(--blue-100, #ebf8ff);
+  color: var(--blue-700, #2b6cb0);
+}

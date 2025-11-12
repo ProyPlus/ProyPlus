@@ -2,6 +2,7 @@ package com.example.gestor_inversores.dto;
 
 import com.example.gestor_inversores.model.enums.Currency;
 import com.example.gestor_inversores.model.enums.EarningStatus;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+//@JsonInclude(JsonInclude.Include.NON_NULL) // No incluirá campos nulos en el JSON
 public class ResponseEarningDTO {
 
     private Long idEarning;
@@ -27,5 +29,6 @@ public class ResponseEarningDTO {
     private Long confirmedById;
     private BigDecimal baseAmount;   // inversión inicial
     private BigDecimal profitAmount; // ganancia calculada
+    private Integer retriesLeft; // Reintentos restantes
 
 }

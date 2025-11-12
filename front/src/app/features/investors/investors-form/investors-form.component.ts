@@ -1,9 +1,12 @@
-import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, inject, signal, OnInit } from '@angular/core';
+import { AbstractControl, AsyncValidatorFn, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { NgIf, NgFor } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { InvestorService } from '../../../core/services/investors.service';
 import { Investor, Province } from '../../../models/investor.model';
 import { Router, RouterLink } from '@angular/router';
+import { of } from 'rxjs';
+import { map, catchError, debounceTime, switchMap, distinctUntilChanged } from 'rxjs/operators';
 
 // PrimeNG
 import { InputTextModule } from 'primeng/inputtext';
@@ -17,39 +20,54 @@ import { TooltipModule } from 'primeng/tooltip';
   templateUrl: './investors-form.component.html',
   styleUrls: ['./investors-form.component.scss']
 })
-export class InvestorFormComponent {
+export class InvestorFormComponent implements OnInit {
   private service = inject(InvestorService);
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private http = inject(HttpClient);
 
-  provinces = Object.values(Province);
+  provinces: { label: string, value: Province }[];
 
   // Signals
   successMessage = signal('');
   showModal = signal(false);
-  usernameError = signal('');
-  emailError = signal('');
-  cuitError = signal('');
 
-  form = this.fb.group({
-    username: ['', [Validators.required, Validators.maxLength(100)]],
-    password: ['', Validators.required],
-    email: ['', [Validators.required, Validators.email, Validators.maxLength(100)]],
-    cuit: ['', [Validators.required, Validators.minLength(11), Validators.maxLength(11)]],
-    contactPerson: ['', [Validators.required, Validators.maxLength(100)]],
-    phone: ['', [Validators.required, Validators.pattern(/^\+?\d{8,15}$/)]],
-    webSite: ['', [Validators.maxLength(100)]],
-    linkedinUrl: ['', Validators.pattern(/^(https?:\/\/).*$/)],
-    description: ['', Validators.maxLength(500)],
-    street: ['', Validators.required],
-    number: ['', Validators.required],
-    city: ['', Validators.required],
-    province: ['', Validators.required],
-    postalCode: ['', Validators.required]
-  });
+  form!: FormGroup;
+
+  constructor() {
+    this.provinces = Object.values(Province).map(prov => ({ label: this.formatProvinceForDisplay(prov), value: prov }));
+  }
+
+  ngOnInit() {
+    this.form = this.fb.group({
+      username: ['',
+        [Validators.required, Validators.maxLength(50), Validators.minLength(3)],
+        [this.usernameValidator()]
+      ],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      email: ['',
+        [Validators.required, Validators.email, Validators.maxLength(100)],
+        [this.emailValidator()]
+      ],
+      cuit: ['',
+        [Validators.required, Validators.minLength(11), Validators.maxLength(11)],
+        [this.cuitValidator()]
+      ],
+      contactPerson: ['', [Validators.required, Validators.maxLength(100), Validators.pattern('^[a-zA-ZÀ-ÿ\\s]*$')]],
+      phone: ['', [Validators.required, Validators.pattern(/^\+?\d{8,15}$/)]],
+      webSite: ['', [Validators.maxLength(100)]],
+      linkedinUrl: ['', Validators.pattern(/^(https?:\/\/.*|linkedin\.com\/.*)?$/)],
+      description: ['', Validators.maxLength(500)],
+      street: ['', Validators.required],
+      number: ['', Validators.required],
+      city: ['', Validators.required],
+      province: ['', Validators.required],
+      postalCode: ['', Validators.required]
+    });
+  }
 
   onSubmit() {
-    if (!this.form.valid) {
+    if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
@@ -76,9 +94,6 @@ export class InvestorFormComponent {
 
     this.service.create(investorData).subscribe({
       next: () => {
-        this.usernameError.set('');
-        this.emailError.set('');
-        this.cuitError.set('');
         this.successMessage.set('Inversor registrado correctamente!');
         this.showModal.set(true);
 
@@ -89,33 +104,78 @@ export class InvestorFormComponent {
         }, 2000);
       },
       error: (err: any) => {
-        this.usernameError.set('');
-        this.emailError.set('');
-        this.cuitError.set('');
         this.successMessage.set('');
-
-        if (err.status === 400 && err.error?.message?.includes('ConstraintViolationException')) {
-          const msg = err.error.message as string;
-          if (msg.includes('investors.username')) this.usernameError.set('Username ya está en uso');
-          if (msg.includes('investors.email')) this.emailError.set('Email ya está en uso');
-          if (msg.includes('investors.cuit')) this.cuitError.set('CUIT ya está en uso');
-        } else {
-          this.successMessage.set('Error al registrar inversor.');
-        }
+        this.successMessage.set('Error al registrar inversor. Por favor, revisa los campos.');
       }
     });
   }
 
+  isInvalidField(field: string): boolean {
+    const control = this.form.get(field);
+    return !!(control && control.invalid && control.touched);
+  }
+
+  // Helper para formatear las provincias en los desplegables
+  private formatProvinceForDisplay(enumValue: string): string {
+    return enumValue.replace(/_/g, ' ').replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+  }
+
   getFieldError(field: string): string | null {
     const control = this.form.get(field);
-    if (!control || !control.touched) return null;
+    if (!control || !control.errors) return null;
 
-    if (control.hasError('required')) return 'Este campo es obligatorio';
-    if (control.hasError('maxlength')) return `Máximo ${control.getError('maxlength').requiredLength} caracteres`;
-    if (control.hasError('minlength')) return `Mínimo ${control.getError('minlength').requiredLength} caracteres`;
-    if (control.hasError('pattern')) return 'Formato inválido';
-    if (control.hasError('email')) return 'Email inválido';
+    const errors = control.errors;
+
+    if (errors['required']) return 'Este campo es obligatorio';
+    if (errors['minlength']) return `Mínimo ${errors['minlength'].requiredLength} caracteres`;
+    if (errors['maxlength']) return `Máximo ${errors['maxlength'].requiredLength} caracteres`;
+    if (errors['pattern']) return 'Formato inválido';
+    if (errors['email']) return 'Email inválido';
+    if (errors['usernameExists']) return 'El nombre de usuario ya está en uso.';
+    if (errors['emailExists']) return 'El email ya está registrado.';
+    if (errors['cuitExists']) return 'El CUIT ya está registrado.';
 
     return null;
+  }
+
+  // --- Validadores Asíncronos ---
+
+  private usernameValidator(): AsyncValidatorFn {
+    return (control: AbstractControl): any => {
+      if (!control.value) return of(null);
+      return of(control.value).pipe(
+        debounceTime(500),
+        distinctUntilChanged(),
+        switchMap(value => this.http.get<boolean>(`/api/users/check-username/${value}`)),
+        map(exists => (exists ? { usernameExists: true } : null)),
+        catchError(() => of(null))
+      );
+    };
+  }
+
+  private emailValidator(): AsyncValidatorFn {
+    return (control: AbstractControl): any => {
+      if (!control.value) return of(null);
+      return of(control.value).pipe(
+        debounceTime(500),
+        distinctUntilChanged(),
+        switchMap(value => this.http.get<boolean>(`/api/users/check-email/${value}`)),
+        map(exists => (exists ? { emailExists: true } : null)),
+        catchError(() => of(null))
+      );
+    };
+  }
+
+  private cuitValidator(): AsyncValidatorFn {
+    return (control: AbstractControl): any => {
+      if (!control.value) return of(null);
+      return of(control.value).pipe(
+        debounceTime(500),
+        distinctUntilChanged(),
+        switchMap(value => this.http.get<boolean>(`/api/investors/check-cuit/${value}`)),
+        map(exists => (exists ? { cuitExists: true } : null)),
+        catchError(() => of(null))
+      );
+    };
   }
 }

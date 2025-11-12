@@ -21,7 +21,7 @@ public class RequestStudentDTO {
     private String username;
 
     @NotBlank(message = "La contraseña es obligatoria")
-    @Size(min = 4, message = "La contraseña debe tener al menos 4 caracteres")
+    @Size(min = 6, message = "La contraseña debe tener al menos 4 caracteres")
     private String password;
 
     @NotBlank(message = "El email es obligatorio")

@@ -55,6 +55,12 @@ public class ProjectController {
         return projectService.getAllProjects(active);
     }
 
+    @GetMapping("/dashboard-admin/projects")
+    public ResponseEntity<List<ResponseProjectDTO>> getAllProjectsAdmin() {
+        List<ResponseProjectDTO> projects = projectService.getAllProjectsAdmin();
+        return ResponseEntity.status(HttpStatus.OK).body(projects);
+    }
+
     /**
     // Endpoint usando ownerId
     @GetMapping("/by-owner/{ownerId}")

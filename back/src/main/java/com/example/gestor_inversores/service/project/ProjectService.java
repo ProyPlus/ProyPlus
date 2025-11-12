@@ -107,6 +107,16 @@ public class ProjectService implements IProjectService {
         Project searchedProject = projectRepository.findById(id)
                 .orElseThrow(() -> new ProjectNotFoundException("The project was not found"));
 
+        // VALIDACIÓN: Solo permitir la modificación si el proyecto está pendiente de financiación.
+        if (searchedProject.getStatus() != ProjectStatus.PENDING_FUNDING) {
+            throw new BusinessException("El proyecto solo puede ser modificado si su estado es 'Pendiente de Financiación' (PENDING_FUNDING).");
+        }
+
+        // VALIDACIÓN: No permitir la modificación si el proyecto ya ha recibido fondos.
+        if (searchedProject.getCurrentGoal().compareTo(BigDecimal.ZERO) > 0) {
+            throw new BusinessException("El proyecto no puede ser modificado porque ya ha comenzado a recibir inversiones.");
+        }
+
         if (!projectDTO.getName().equals(searchedProject.getName()) &&
                 projectRepository.existsByNameAndDeletedFalse(projectDTO.getName())) {
             throw new ExistingProjectException("There is already a project with that name");
@@ -114,6 +124,15 @@ public class ProjectService implements IProjectService {
 
         if (projectDTO.getEstimatedEndDate().isBefore(projectDTO.getStartDate())) {
             throw new InvalidProjectException("Estimated end date cannot be before start date");
+        }
+
+        // Si la descripción cambia, se vuelve a evaluar la etiqueta con la IA
+        if (!projectDTO.getDescription().equals(searchedProject.getDescription())) {
+            String selectedTag = geminiService.askGemini(this.promptToGenerateTagSelection(projectDTO.getDescription())).toUpperCase();
+            String cleanedTag = selectedTag.trim();
+            System.out.println("Etiqueta re-evaluada por cambio en descripción: " + cleanedTag);
+            ProjectTag tag = projectTagService.getTagByName(cleanedTag);
+            searchedProject.setProjectTag(tag);
         }
 
         Project updatedProject = ProjectMapper.requestProjectUpdateToProject(projectDTO, searchedProject);
@@ -161,6 +180,17 @@ public class ProjectService implements IProjectService {
         Project searchedProject = projectRepository.findById(id)
                 .orElseThrow(() -> new ProjectNotFoundException("The project was not found"));
 
+        // VALIDACIÓN: No permitir la eliminación si el proyecto ya tiene contratos asociados.
+        List<Contract> contracts = contractRepository.findByProject_IdProject(id);
+        if (!contracts.isEmpty()) {
+            throw new BusinessException("El proyecto no puede ser eliminado porque ya tiene contratos asociados.");
+        }
+
+        // VALIDACIÓN: No permitir la eliminación si el proyecto ya ha recibido fondos.
+        if (searchedProject.getCurrentGoal().compareTo(BigDecimal.ZERO) > 0) {
+            throw new BusinessException("El proyecto no puede ser eliminado porque ya ha recibido inversiones.");
+        }
+
         searchedProject.setDeleted(true);
         searchedProject.setDeletedAt(LocalDateTime.now());
         projectRepository.save(searchedProject);
@@ -174,6 +204,15 @@ public class ProjectService implements IProjectService {
         } else {
             projects = projectRepository.findByDeletedTrue();
         }
+        return projects.stream()
+                .map(ProjectMapper::projectToResponseProjectDTO)
+                .toList();
+    }
+
+    @Override
+    public List<ResponseProjectDTO> getAllProjectsAdmin() {
+        List<Project> projects = projectRepository.findAll();
+
         return projects.stream()
                 .map(ProjectMapper::projectToResponseProjectDTO)
                 .toList();
@@ -310,34 +349,13 @@ public class ProjectService implements IProjectService {
                 .collect(Collectors.toSet());
 
         for (Investor investor : investorsToNotify) {
-            List<Investment> investorSpecificInvestments = allInvestments.stream()
-                    .filter(inv -> inv.getGeneratedBy().equals(investor))
-                    .toList();
-
-            int investmentCount = investorSpecificInvestments.size();
-
-            Map<String, BigDecimal> sumsByCurrency = investorSpecificInvestments.stream()
-                    .collect(Collectors.groupingBy(
-                            inv -> inv.getCurrency().name(),
-                            Collectors.reducing(BigDecimal.ZERO, Investment::getAmount, BigDecimal::add)
-                    ));
-
-            String totalInvestedString = sumsByCurrency.entrySet().stream()
-                    .map(entry -> String.format("%.2f %s", entry.getValue(), entry.getKey()))
-                    .collect(Collectors.joining(" y "));
-
-            String investmentDetails;
-            if (investmentCount == 1) {
-                investmentDetails = String.format("tu inversión de %s", totalInvestedString);
-            } else {
-                investmentDetails = String.format("tus %d inversiones, que suman un total de %s", investmentCount, totalInvestedString);
-            }
+            String investmentDetails = buildInvestmentDetailsString(allInvestments, investor);
 
             String to = investor.getEmail();
             String subject = String.format("Cancelación del Proyecto: '%s'", project.getName());
             String body = String.format(
                 "Hola %s,\n\nTe informamos que el proyecto '%s' ha sido cancelado por el estudiante responsable.\n\n" +
-                "El siguiente paso es la devolución de %s.\n\n" +
+                "El siguiente paso es la devolución de %s.\n\n" + // Usamos el string construido
                 "Por favor, mantente atento a las notificaciones en la plataforma y contacta al estudiante si tienes alguna duda.\n\n" +
                 "Lamentamos los inconvenientes.\n\n" +
                 "Saludos,\nEl equipo de ProyPlus",
@@ -376,34 +394,13 @@ public class ProjectService implements IProjectService {
                 .collect(Collectors.toSet());
 
         for (Investor investor : investorsToNotify) {
-            List<Investment> investorSpecificInvestments = allInvestments.stream()
-                    .filter(inv -> inv.getGeneratedBy().equals(investor))
-                    .toList();
-
-            int investmentCount = investorSpecificInvestments.size();
-
-            Map<String, BigDecimal> sumsByCurrency = investorSpecificInvestments.stream()
-                    .collect(Collectors.groupingBy(
-                            inv -> inv.getCurrency().name(),
-                            Collectors.reducing(BigDecimal.ZERO, Investment::getAmount, BigDecimal::add)
-                    ));
-
-            String totalInvestedString = sumsByCurrency.entrySet().stream()
-                    .map(entry -> String.format("%.2f %s", entry.getValue(), entry.getKey()))
-                    .collect(Collectors.joining(" y "));
-
-            String investmentDetails;
-            if (investmentCount == 1) {
-                investmentDetails = String.format("tu inversión de %s", totalInvestedString);
-            } else {
-                investmentDetails = String.format("tus %d inversiones, que suman un total de %s", investmentCount, totalInvestedString);
-            }
+            String investmentDetails = buildInvestmentDetailsString(allInvestments, investor);
 
             String to = investor.getEmail();
             String subject = String.format("Proyecto no financiado: '%s'", project.getName());
             String body = String.format(
                     "Hola %s,\n\nTe informamos que el proyecto '%s' no alcanzó su meta de financiación y ha sido marcado como no financiado.\n\n" +
-                    "El siguiente paso es la devolución de %s.\n\n" +
+                    "El siguiente paso es la devolución de %s.\n\n" + // Usamos el string construido
                     "Por favor, mantente atento a las notificaciones en la plataforma y contacta al estudiante para coordinar la devolución.\n\n" +
                     "Lamentamos los inconvenientes.\n\n" +
                     "Saludos,\nEl equipo de ProyPlus",
@@ -477,6 +474,33 @@ public class ProjectService implements IProjectService {
         return projects.stream()
                 .map(ProjectMapper::projectToResponseProjectDTO)
                 .toList();
+    }
+
+    private String buildInvestmentDetailsString(List<Investment> allInvestments, Investor investor) {
+        List<Investment> investorSpecificInvestments = allInvestments.stream()
+                .filter(inv -> inv.getGeneratedBy().equals(investor))
+                .toList();
+
+        int investmentCount = investorSpecificInvestments.size();
+
+        Map<String, BigDecimal> sumsByCurrency = investorSpecificInvestments.stream()
+                .collect(Collectors.groupingBy(
+                        inv -> inv.getCurrency().name(),
+                        Collectors.reducing(BigDecimal.ZERO, Investment::getAmount, BigDecimal::add)
+                ));
+
+        String totalInvestedString = sumsByCurrency.entrySet().stream()
+                .map(entry -> String.format("%.2f %s", entry.getValue(), entry.getKey()))
+                .collect(Collectors.joining(" y "));
+
+        String investmentDetails;
+        if (investmentCount == 1) {
+            investmentDetails = String.format("tu inversión de %s", totalInvestedString);
+        } else {
+            investmentDetails = String.format("tus %d inversiones, que suman un total de %s", investmentCount, totalInvestedString);
+        }
+
+        return investmentDetails;
     }
 
     private String promptToGenerateTagSelection(String description) {

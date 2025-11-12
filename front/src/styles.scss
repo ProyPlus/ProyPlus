@@ -3,17 +3,39 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ===== PrimeNG (usa el theme que tengas instalado) =====
-   Si NO lo importás en angular.json, podés importarlo acá:
-   @import "primeng/resources/themes/lara-light-blue/theme.css";
-   @import "primeng/resources/primeng.min.css";
-*/
+/* ===== TEMA GLOBAL DE LA APLICACIÓN ===== */
+:root {
+  /* Paleta de Colores Moderna */
+  --primary-color: #4f46e5; /* El violeta del chatbot (Indigo 600) */
+  --primary-color-text: #ffffff; /* Texto para fondos primarios */
+
+  --surface-ground: #f8f9fa; /* Fondo general de la página (gris muy claro) */
+  --surface-section: #ffffff; /* Fondo para secciones como topbar, cards */
+  --surface-card: #ffffff;
+  --surface-hover: #f1f3f5; /* Color para hover sutil */
+  --surface-border: #e9ecef; /* Bordes suaves */
+
+  --text-color: #343a40; /* Texto principal (gris oscuro, no negro puro) */
+  --text-color-secondary: #6c757d; /* Texto secundario (más claro) */
+
+  /* Variables para el gradiente */
+  --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+}
 
 /* Base mínima (no forzamos colores del tema) */
 html, body { height: 100%; }
 body {
   margin: 0;
   font-family: Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--surface-ground); /* Aplicar el fondo general */
+  color: var(--text-color); /* Aplicar el color de texto general */
+}
+
+/* Estilo global para todas las tarjetas de PrimeNG */
+p-card .p-card {
+  border-radius: 1rem; /* Bordes más redondeados */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--surface-border);
 }
 
 /* -------- (Opcional) helpers para tiles con Tailwind -------- */

@@ -2,6 +2,7 @@ package com.example.gestor_inversores.service.contract;
 
 import com.example.gestor_inversores.dto.*;
 import java.util.List;
+import java.util.Map;
 
 public interface IContractService {
 
@@ -31,4 +32,5 @@ public interface IContractService {
     List<ResponseContractDTO> getContractsByInvestor(Long investorId);
     List<ResponseContractDTO> getContractsByOwner(Long ownerId);
     List<ResponseContractDTO> getContractsByInvestorAndProject(Long investorId, Long projectId);
+    Map<String, Boolean> checkContractExists(Long projectId, String contractName);
 }

@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/project-documents")
 @RequiredArgsConstructor
+//@CrossOrigin(origins = "http://localhost:4200")
 public class ProjectDocumentController {
 
     private final IProjectDocumentService projectDocumentService;

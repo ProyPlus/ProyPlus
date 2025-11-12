@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -43,7 +44,9 @@ public class ControllerHandler extends ResponseEntityExceptionHandler {
             ExistingProjectException.class, ContractAlreadySignedException.class,
             ContractCannotBeModifiedException.class, InvalidContractOperationException.class,
             RoleAlreadyExistsException.class, // Añadida
-            PermissionAlreadyExistsException.class // Añadida
+            PermissionAlreadyExistsException.class, // Añadida
+            StudentDesactivationException.class, // Añadida
+            InvestorDesactivationException.class // Añadida
     })
     public ResponseEntity<ApiError> handleConflictExceptions(RuntimeException ex) {
         ApiError apiError = new ApiError("Conflicto: " + ex.getMessage(), HttpStatus.CONFLICT, LocalDateTime.now());
@@ -64,7 +67,7 @@ public class ControllerHandler extends ResponseEntityExceptionHandler {
     // --- 401 UNAUTHORIZED ---
     @ExceptionHandler({
             BadCredentialsException.class, InvalidTokenException.class,
-            ExpiredTokenException.class
+            ExpiredTokenException.class, DisabledException.class // Añadida
     })
     public ResponseEntity<ApiError> handleUnauthorizedExceptions(RuntimeException ex) {
         ApiError apiError = new ApiError("No autorizado: " + ex.getMessage(), HttpStatus.UNAUTHORIZED, LocalDateTime.now());

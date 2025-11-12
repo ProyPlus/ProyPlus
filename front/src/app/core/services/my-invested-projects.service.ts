@@ -16,7 +16,7 @@ export interface IInvestedProjectApi {
   ownerId?: number;
   ownerName?: string | null;
   students?: Array<{ id: number; name: string }>;
-  category?: string;
+  tagName?: string; // El backend devuelve la categoría en 'tagName'
 }
 
 export interface IInvestedProject {
@@ -43,7 +43,7 @@ function adapt(p: IInvestedProjectApi): IInvestedProject {
     fundingGoal: p.budgetGoal ?? null,
     fundingRaised: p.currentGoal ?? null,
     owner: p.ownerName ?? null,
-    category: '—',
+    category: p.tagName ?? '—', // Mapear desde tagName
     university: null,
     students: p.students ?? null,
   };

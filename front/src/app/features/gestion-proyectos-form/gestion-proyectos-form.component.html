@@ -1,0 +1,327 @@
+<p-toast></p-toast>
+
+
+<p-toolbar class="mb-3">
+  <div class="p-toolbar-group-left flex items-center gap-3">
+    
+    <button 
+      pButton 
+      icon="pi pi-arrow-left" 
+      label="Volver" 
+      class="ml-3" 
+      (click)="goBack()">
+    </button>
+    
+    <button 
+      pButton 
+      label="Refrescar" 
+      icon="pi pi-refresh" 
+      class="ml-3" 
+      (click)="refreshProjectData()" 
+      [disabled]="!form.value.id">
+    </button>
+  </div>
+  
+  <div class="p-toolbar-group-right flex items-center gap-2">
+    <button
+      pButton
+      label="Guardar proyecto"
+      icon="pi pi-save"
+      class="p-button-success p-button-sm"
+      (click)="saveProject()"
+      [disabled]="form.invalid"
+    ></button>
+  </div>
+</p-toolbar>
+
+<p-card>
+  <form [formGroup]="form" class="p-fluid grid mt-4">
+    <div class="field col-12 md:col-6">
+      <label class="block font-medium">Título</label>
+      <input
+        pInputText
+        formControlName="name" />
+    </div>
+
+    <div class="field col-12 md:col-6">
+      <label class="block font-medium">Meta presupuestaria</label>
+      <input
+        type="number"
+        pInputText
+        formControlName="budgetGoal" />
+    </div>
+
+    <div class="field col-12">
+      <label class="block font-medium">Descripción</label>
+      <textarea
+        pInputTextarea
+        rows="4"
+        class="w-full"
+        formControlName="description" ></textarea>
+    </div>
+
+    <div class="field col-12 md:col-6">
+      <label class="block font-medium">Estado</label>
+      <select
+        class="w-full p-inputtext p-component p-2"
+        formControlName="status" >
+        <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+      </select>
+    </div>
+
+    <div class="field col-12 md:col-6">
+      <label class="block font-medium">Fecha de inicio</label>
+      <input
+        type="date"
+        pInputText
+        class="w-full"
+        formControlName="startDate" />
+    </div>
+
+    <div class="field col-12 md:col-6">
+      <label class="block font-medium">Fecha fin estimada</label>
+      <input
+        type="date"
+        pInputText
+        class="w-full"
+        formControlName="estimatedEndDate" />
+    </div>
+
+    <div class="field col-12 md:col-6">
+      <label class="block font-medium">Fecha fin</label>
+      <input
+        type="date"
+        pInputText
+        class="w-full"
+        formControlName="endDate" />
+    </div>
+    
+    <div class="field col-12 flex items-center gap-2">
+      <input
+        type="checkbox"
+        id="deleted"
+        formControlName="deleted" />
+      <label for="deleted">Eliminado</label>
+    </div>
+  </form>
+
+  <div class="mt-6">
+    <div class="flex gap-2 mb-3 border-b-2 border-gray-200">
+      <button
+        pButton
+        type="button"
+        label="Contratos"
+        class="p-button-text p-button-sm tab-button"
+        [ngClass]="{ 'tab-active': activeTab === 'contracts' }"
+        (click)="activeTab = 'contracts'"
+      ></button>
+      <button
+        pButton
+        type="button"
+        label="Inversiones"
+        class="p-button-text p-button-sm tab-button"
+        [ngClass]="{ 'tab-active': activeTab === 'investments' }"
+        (click)="activeTab = 'investments'"
+      ></button>
+      <button
+        pButton
+        type="button"
+        label="Ganancias"
+        class="p-button-text p-button-sm tab-button"
+        [ngClass]="{ 'tab-active': activeTab === 'earnings' }"
+        (click)="activeTab = 'earnings'"
+      ></button>
+    </div>
+
+    <div *ngIf="activeTab === 'contracts'">
+      <table class="p-datatable-table">
+        <thead class="bg-gray-100">
+          <tr class="text-left">
+            <th class="py-3 px-4">ID</th>
+            <th class="py-3 px-4">Título</th>
+            <th class="py-3 px-4">Monto</th>
+            <th class="py-3 px-4">Estado</th>
+            <th class="py-3 px-4 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of contracts" class="border-b hover:bg-gray-50">
+            <td class="py-2 px-4">{{ c.idContract }}</td>
+            <td class="py-2 px-4">{{ c.textTitle }}</td>
+            <td class="py-2 px-4">{{ c.amount }}</td>
+            <td class="py-2 px-4">
+              <span class="status-tag">{{ c.status }}</span>
+            </td>
+            <td class="py-2 px-4 text-right">
+              <button
+                pButton
+                icon="pi pi-pencil"
+                class="p-button-rounded p-button-text p-button-sm"
+                (click)="openEditContract(c)"
+              ></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="activeTab === 'investments'">
+      <table class="p-datatable-table">
+        <thead class="bg-gray-100">
+          <tr class="text-left">
+            <th class="py-3 px-4">ID</th>
+            <th class="py-3 px-4">Monto</th>
+            <th class="py-3 px-4">Moneda</th>
+            <th class="py-3 px-4">Estado</th>
+            <th class="py-3 px-4 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let i of investments" class="border-b hover:bg-gray-50">
+            <td class="py-2 px-4">{{ i.idInvestment }}</td>
+            <td class="py-2 px-4">{{ i.amount }}</td>
+            <td class="py-2 px-4">{{ i.currency }}</td>
+            <td class="py-2 px-4">
+              <span class="status-tag">{{ i.status }}</span>
+            </td>
+            <td class="py-2 px-4 text-right">
+              <button
+                pButton
+                icon="pi pi-pencil"
+                class="p-button-rounded p-button-text p-button-sm"
+                (click)="openEditInvestment(i)"
+              ></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="activeTab === 'earnings'">
+      <table class="p-datatable-table">
+        <thead class="bg-gray-100">
+          <tr class="text-left">
+            <th class="py-3 px-4">ID</th>
+            <th class="py-3 px-4">Monto</th>
+            <th class="py-3 px-4">Estado</th>
+            <th class="py-3 px-4 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let e of earnings" class="border-b hover:bg-gray-50">
+            <td class="py-2 px-4">{{ e.idEarning }}</td>
+            <td class="py-2 px-4">{{ e.amount }}</td>
+            <td class="py-2 px-4">
+              <span class="status-tag">{{ e.status }}</span>
+            </td>
+            <td class="py-2 px-4 text-right">
+              <button
+                pButton
+                icon="pi pi-pencil"
+                class="p-button-rounded p-button-text p-button-sm"
+                (click)="openEditEarning(e)"
+              ></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</p-card>
+
+<div *ngIf="showContractModal && editingContract" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+  <div class="bg-white p-0 w-full max-w-2xl rounded shadow-2xl overflow-hidden modal-content">
+    <div class="p-4 border-b flex justify-between items-center">
+      <h3 class="text-lg font-semibold">
+        Editar contrato {{ editingContract.idContract }}
+      </h3>
+      <button pButton icon="pi pi-times" class="p-button-rounded p-button-text p-button-sm" (click)="showContractModal=false"></button>
+    </div>
+
+    <div style="max-height: 60vh; overflow: auto; padding: 1rem;" class="p-fluid grid">
+      <div class="field col-12">
+        <label>Estado</label>
+        <select [(ngModel)]="editingContract.status" class="w-full p-inputtext p-component p-2">
+          <option *ngFor="let s of contractStatusOptions" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div
+      style="
+        position: sticky;
+        bottom: 0;
+        background: white;
+        padding: 0.5rem 1rem;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+        border-top: 1px solid #e5e7eb;
+      "
+    >
+      <button
+        pButton
+        label="Cancelar"
+        class="p-button-secondary p-button-text"
+        (click)="showContractModal = false"
+      ></button>
+      <button pButton label="Guardar" (click)="saveContract()"></button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showInvestmentModal && editingInvestment" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+  <div class="bg-white p-4 w-full max-w-md rounded shadow-2xl">
+    <div class="flex justify-between items-center mb-3 border-b pb-2">
+        <h3 class="text-lg font-semibold">Editar inversión {{ editingInvestment.idInvestment }}</h3>
+        <button pButton icon="pi pi-times" class="p-button-rounded p-button-text p-button-sm" (click)="showInvestmentModal=false"></button>
+    </div>
+
+    <div class="p-fluid">
+        <div class="field col-12">
+            <label>Estado</label>
+            <select [(ngModel)]="editingInvestment.status" class="w-full p-inputtext p-component p-2">
+                <option *ngFor="let s of investmentStatusOptions" [value]="s">{{ s }}</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="flex justify-end gap-2 mt-4 pt-3 border-t">
+      <button
+        pButton
+        label="Cancelar"
+        class="p-button-secondary p-button-text"
+        (click)="showInvestmentModal = false"
+      ></button>
+      <button pButton label="Guardar" (click)="saveInvestment()"></button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showEarningModal && editingEarning" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+  <div class="bg-white p-4 w-full max-w-md rounded shadow-2xl">
+    <div class="flex justify-between items-center mb-3 border-b pb-2">
+        <h3 class="text-lg font-semibold">Editar ganancia {{ editingEarning.idEarning }}</h3>
+        <button pButton icon="pi pi-times" class="p-button-rounded p-button-text p-button-sm" (click)="showEarningModal=false"></button>
+    </div>
+    
+    <div class="p-fluid">
+        <div class="field col-12">
+            <label>Estado</label>
+            <select [(ngModel)]="editingEarning.status" class="w-full p-inputtext p-component p-2">
+                <option *ngFor="let s of earningStatusOptions" [value]="s">{{ s }}</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="flex justify-end gap-2 mt-4 pt-3 border-t">
+      <button
+        pButton
+        label="Cancelar"
+        class="p-button-secondary p-button-text"
+        (click)="showEarningModal = false"
+      ></button>
+      <button pButton label="Guardar" (click)="saveEarning()"></button>
+    </div>
+  </div>
+</div>

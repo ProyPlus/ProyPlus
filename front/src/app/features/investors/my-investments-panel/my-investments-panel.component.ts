@@ -122,8 +122,13 @@ export class MyInvestmentsPanelComponent implements OnInit {
   getInvestmentStatusLabel(status: string | null): string {
     switch (status) {
       case 'IN_PROGRESS': return 'En Progreso';
-      case 'RECEIVED': return 'Recibida';
-      case 'NOT_RECEIVED': return 'No Recibida';
+      case 'PENDING_CONFIRMATION': return 'Pendiente de Confirmación';
+      case 'RECEIVED': return 'Recibida por el Estudiante';
+      case 'COMPLETED': return 'Inversión Completada';
+      case 'NOT_RECEIVED': return 'No Recibida por el Estudiante';
+      case 'CANCELLED': return 'Cancelada';
+      case 'PENDING_RETURN': return 'Devolución Pendiente';
+      case 'RETURNED': return 'Devolución Completada';
       default: return status || 'Desconocido';
     }
   }

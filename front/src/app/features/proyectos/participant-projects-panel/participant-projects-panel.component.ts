@@ -175,6 +175,7 @@ export class ParticipantProjectsPanelComponent implements OnInit {
       case 'IN_PROGRESS': return 'En Progreso';
       case 'PENDING_FUNDING': return 'Pendiente de Financiación';
       case 'COMPLETED': return 'Completado';
+      case 'NOT_FUNDED': return 'No Financiado';
       case 'CANCELLED': return 'Cancelado';
       default: return status || 'No definido';
     }
