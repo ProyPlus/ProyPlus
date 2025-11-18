@@ -121,7 +121,7 @@
                   [multiple]="true"
                   accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.png,"
                   [maxFileSize]="10000000"
-                  (onSelect)="onUpload($event)"    (onError)="onUploadError($event)"
+                  (onUpload)="onUpload($event)"    (onError)="onUploadError($event)"
                   [customUpload]="true" 
                   chooseLabel="Subir Documentos"
                   [showCancelButton]="false"
